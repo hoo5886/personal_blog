@@ -2,6 +2,7 @@ package com.example.personal_blog.repository.dao;
 
 import com.example.personal_blog.entity.Article;
 import com.example.personal_blog.repository.dto.ArticleDto;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +19,8 @@ public class ArticleDao {
     private long hits;
     private int likes;
     private boolean isDeleted;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     //  DTO to DAO
     public static ArticleDao from(ArticleDto dto) {
@@ -28,7 +29,10 @@ public class ArticleDao {
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .likes(dto.getLikes())
+                .hits(dto.getHits())
+                .isDeleted(dto.isDeleted())
                 .createdAt(dto.getCreatedAt()) // String.valueOf(now())로써 DTO로부터 받는다.
+                .updatedAt(dto.getUpdatedAt())
                 .build();
     }
 
@@ -39,7 +43,10 @@ public class ArticleDao {
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .likes(entity.getLikes())
-                .createdAt(entity.getCreatedAt().toString())
+                .hits(entity.getHits())
+                .isDeleted(entity.isDeleted())
+                .createdAt(entity.getCreatedAt())
+                .updatedAt(entity.getUpdatedAt())
                 .build();
     }
 
@@ -50,7 +57,10 @@ public class ArticleDao {
                 .title(dao.getTitle())
                 .content(dao.getContent())
                 .likes(dao.getLikes())
+                .hits(dao.getHits())
+                .isDeleted(dao.isDeleted())
                 .createdAt(dao.getCreatedAt())
+                .updatedAt(dao.getUpdatedAt())
                 .build();
     }
 
@@ -61,6 +71,10 @@ public class ArticleDao {
                 .title(dao.getTitle())
                 .content(dao.getContent())
                 .likes(dao.getLikes())
+                .hits(dao.getHits())
+                .isDeleted(dao.isDeleted())
+                .createdAt(dao.getCreatedAt())
+                .updatedAt(dao.getUpdatedAt())
                 .build();
     }
 }

@@ -20,5 +20,11 @@ spring:
 
 logging:
   level:
-    org.hibernate.SQL: debug
+    org:
+      hibernate.SQL: debug
+      springframework:
+        test:
+          context: DEBUG
+          web: DEBUG
+
 
