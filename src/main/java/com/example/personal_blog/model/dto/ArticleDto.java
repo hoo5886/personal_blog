@@ -1,6 +1,6 @@
-package com.example.personal_blog.repository.dto;
+package com.example.personal_blog.model.dto;
 
-import com.example.personal_blog.repository.dao.ArticleDao;
+import com.example.personal_blog.model.dao.ArticleDao;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

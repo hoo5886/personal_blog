@@ -1,6 +1,6 @@
 package com.example.personal_blog.controller;
 
-import com.example.personal_blog.repository.dto.ArticleDto;
+import com.example.personal_blog.model.dto.ArticleDto;
 import com.example.personal_blog.service.ArticleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
