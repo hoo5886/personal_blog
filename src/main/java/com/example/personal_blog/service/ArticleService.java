@@ -2,8 +2,8 @@ package com.example.personal_blog.service;
 
 import com.example.personal_blog.entity.Article;
 import com.example.personal_blog.repository.ArticleRepository;
-import com.example.personal_blog.repository.dao.ArticleDao;
-import com.example.personal_blog.repository.dto.ArticleDto;
+import com.example.personal_blog.model.dao.ArticleDao;
+import com.example.personal_blog.model.dto.ArticleDto;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

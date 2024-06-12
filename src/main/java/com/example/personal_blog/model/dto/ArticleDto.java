@@ -1,8 +1,7 @@
-package com.example.personal_blog.repository.dto;
+package com.example.personal_blog.model.dto;
 
-import static java.time.LocalTime.now;
-
-import com.example.personal_blog.repository.dao.ArticleDao;
+import com.example.personal_blog.model.dao.ArticleDao;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,8 +18,8 @@ public class ArticleDto {
     private long hits;
     private int likes;
     private boolean isDeleted;
-    private String createdAt;
-    private String updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     // DTO로부터 DAO로 변환
     public static ArticleDto from(ArticleDao dao) {
@@ -29,7 +28,10 @@ public class ArticleDto {
             .title(dao.getTitle())
             .content(dao.getContent())
             .likes(dao.getLikes())
+            .hits(dao.getHits())
+            .isDeleted(dao.isDeleted())
             .createdAt(dao.getCreatedAt())
+            .updatedAt(dao.getUpdatedAt())
             .build();
     }
 
@@ -40,7 +42,10 @@ public class ArticleDto {
             .title(dto.getTitle())
             .content(dto.getContent())
             .likes(dto.getLikes())
+            .hits(dto.getHits())
+            .isDeleted(dto.isDeleted())
             .createdAt(dto.getCreatedAt()) // String.valueOf(now())로써 DTO로부터 받는다.
+            .updatedAt(dto.getUpdatedAt())
             .build();
     }
 }

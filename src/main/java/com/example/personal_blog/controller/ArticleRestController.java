@@ -1,6 +1,6 @@
 package com.example.personal_blog.controller;
 
-import com.example.personal_blog.repository.dto.ArticleDto;
+import com.example.personal_blog.model.dto.ArticleDto;
 import com.example.personal_blog.service.ArticleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +35,9 @@ public class ArticleRestController {
     }
 
     @PostMapping("/write")
-    public ResponseEntity<String> writeArticle(@RequestBody ArticleDto dto) {
+    public ResponseEntity<ArticleDto> writeArticle(@RequestBody ArticleDto dto) {
         service.write(dto);
-        return new ResponseEntity<>("글 작성 완료", HttpStatus.OK);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/delete")

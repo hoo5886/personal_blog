@@ -3,6 +3,7 @@ plugins {
     id 'war'
     id 'org.springframework.boot' version '3.3.0'
     id 'io.spring.dependency-management' version '1.1.5'
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com.example'
@@ -17,6 +18,14 @@ java {
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
+    }
+    asciidoctorExt
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from ("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
     }
 }
 
@@ -35,6 +44,21 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'com.mysql:mysql-connector-j'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
+}
+
+test {
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
 }
 
 tasks.named('test') {
