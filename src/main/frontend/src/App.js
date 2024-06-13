@@ -1,24 +1,57 @@
 import './App.css';
-import {Route, Routes} from "react-router-dom";
-import Home from "./pages/Home";
+import {BrowserRouter as Router, Route, Routes} from "react-router-dom";
 import Header from "./components/Header";
 import Tags from "./components/Tags";
+import {useEffect, useState} from "react";
+import {fetchHello, fetchArticles} from "./apis";
+import Articles from "./pages/Articles";
+import Hello from "./pages/Hello";
 
 function App() {
+
+  const [message, setMessage] = useState('');
+  const [list, setList] = useState([]);
+
+  useEffect(() => {
+    // /hello 엔드포인트 호출
+    const getHelloMessage = async () => {
+      try {
+        const data = await fetchHello();
+        setMessage(data);
+      } catch (error) {
+        console.error('Error fetching hello message:', error);
+      }
+    };
+
+    // /list 엔드포인트 호출
+    const getArticlesData = async () => {
+      try {
+        const data = await fetchArticles();
+        setList(data);
+      } catch (error) {
+        console.error('Error fetching list data:', error);
+      }
+    };
+
+    getHelloMessage();
+    getArticlesData();
+  }, []);
+
   return (
-    <div className="container">
-      <Header className="header"/>
-      <div className="main">
+        <div className="container">
+          <Header className="header" />
 
-        <div className="content">
-          <Routes>
-            <Route path="/" element={<Home />} />
-          </Routes>
+          <div className="main">
+            <div className="content">
+              <Routes>
+                <Route path="/hello" element={<Hello />} />
+                <Route path="/list" element={<Articles />} />
+              </Routes>
+            </div>
+
+            <Tags className="sidebar" />
+          </div>
         </div>
-
-        <Tags className="sidebar" />
-      </div>
-    </div>
   );
 }
 
