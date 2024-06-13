@@ -1,10 +1,9 @@
-import Header from "../components/Header";
-import Button from "../components/Button";
+import Articles from "./Articles";
 
 const Home = () => {
   return (
       <div>
-        <Header/>
+        <Articles/>
       </div>
   );
 };
