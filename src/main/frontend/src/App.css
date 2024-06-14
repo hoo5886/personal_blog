@@ -9,25 +9,24 @@
   flex: 1;
 }
 
-.header {
+.main .header {
   height: 50px;
-  background-color: #f0f0f0;
+  background-color: hotpink;
   border: 1px solid black;
   text-align: center;
   line-height: 50px;
 }
 
-.sidebar {
+.main .sidebar {
   width: 200px;
-  background-color: #f9f9f9;
-  border: 1px solid black;
+  background-color: yellow;
   text-align: center;
   line-height: 50px;
 }
 
-.content {
+.main .content {
   flex: 1;
-  border: 1px solid yellow;
+  background-color: wheat;
   text-align: center;
   line-height: 50px;
 }
