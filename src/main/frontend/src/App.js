@@ -6,6 +6,7 @@ import {useEffect, useState} from "react";
 import {fetchHello, fetchArticles} from "./apis";
 import Articles from "./pages/Articles";
 import Hello from "./pages/Hello";
+import Write from "./pages/Write";
 
 function App() {
 
@@ -46,6 +47,7 @@ function App() {
               <Routes>
                 <Route path="/hello" element={<Hello />} />
                 <Route path="/list" element={<Articles />} />
+                <Route path="/edit" element={<Write />} />
               </Routes>
             </div>
 

@@ -7,7 +7,7 @@ const Articles = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await axios.get('/api/list');
+        const response = await axios.get('/list');
         setList(response.data);
       } catch (error) {
         console.error('Error fetching list data:', error);

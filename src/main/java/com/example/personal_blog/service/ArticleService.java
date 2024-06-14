@@ -31,6 +31,13 @@ public class ArticleService {
         return dtoList;
     }
 
+    public ArticleDto read(Long id) {
+        ArticleDao dao = ArticleDao.from(articleRepository.findById(id).orElse(null));
+        ArticleDto dto = ArticleDto.from(dao);
+
+        return dto;
+    }
+
     public String delete(ArticleDto dto) {
         var entity = convertToEntity(dto);
         articleRepository.deleteById(entity.getId());

@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +27,11 @@ public class ArticleRestController {
     @GetMapping("/list")
     public ResponseEntity<List<ArticleDto>> getArticleList() {
         return new ResponseEntity<>(service.getArticleList(), HttpStatus.OK);
+    }
+
+    @GetMapping("/article/{id}")
+    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) {
+        return new ResponseEntity<>(service.read(id), HttpStatus.OK);
     }
 
     @PostMapping("/update")
