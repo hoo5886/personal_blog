@@ -6,6 +6,7 @@ import com.example.personal_blog.model.dao.ArticleDao;
 import com.example.personal_blog.model.dto.ArticleDto;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,16 +33,16 @@ public class ArticleService {
     }
 
     public ArticleDto read(Long id) {
-        ArticleDao dao = ArticleDao.from(articleRepository.findById(id).orElse(null));
-        ArticleDto dto = ArticleDto.from(dao);
+        ArticleDao dao = ArticleDao.from(
+            Objects.requireNonNull(articleRepository.findById(id).orElse(null)));
 
-        return dto;
+        return ArticleDto.from(dao);
     }
 
-    public String delete(ArticleDto dto) {
+    public void delete(ArticleDto dto) {
+        dto.setDeleted(true);
         var entity = convertToEntity(dto);
-        articleRepository.deleteById(entity.getId());
-        return "삭제된 글: " + dto.getId();
+        articleRepository.save(entity);
     }
 
     public String update(ArticleDto dto) {
