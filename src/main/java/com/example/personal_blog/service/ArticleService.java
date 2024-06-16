@@ -39,8 +39,9 @@ public class ArticleService {
     }
 
     public String delete(ArticleDto dto) {
+        dto.setDeleted(true);
         var entity = convertToEntity(dto);
-        articleRepository.deleteById(entity.getId());
+        articleRepository.save(entity);
         return "삭제된 글: " + dto.getId();
     }
 

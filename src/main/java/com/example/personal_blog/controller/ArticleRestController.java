@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,7 +35,7 @@ public class ArticleRestController {
         return new ResponseEntity<>(service.read(id), HttpStatus.OK);
     }
 
-    @PostMapping("/update")
+    @PutMapping("/update")
     public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto) {
         service.update(dto);
         return new ResponseEntity<>("글 수정 완료", HttpStatus.OK);
@@ -46,7 +47,7 @@ public class ArticleRestController {
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/delete")
+    @PutMapping("/delete")
     public ResponseEntity<String> deleteArticle(@RequestBody ArticleDto dto) {
         service.delete(dto);
         return new ResponseEntity<>("글 삭제 완료", HttpStatus.OK);
