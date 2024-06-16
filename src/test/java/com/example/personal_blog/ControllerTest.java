@@ -165,4 +165,40 @@ public class ControllerTest {
             )
         );
     }
+
+    @Test
+    @DisplayName("게시글 조회")
+    void read() throws Exception {
+        ArticleDto dto = new ArticleDto();
+        dto.setId(1L);
+        dto.setTitle("title");
+        dto.setContent("content");
+        dto.setHits(0);
+        dto.setLikes(0);
+        dto.setDeleted(false);
+        dto.setCreatedAt(LocalDateTime.now());
+        given(service.read(1L)).willReturn(dto);
+
+        this.mockMvc.perform(get("/article/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(jsonPath("$.id").value(1L))
+            .andExpect(jsonPath("$.title").value("title"))
+            .andExpect(jsonPath("$.content").value("content"))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andDo(document("/article",
+                responseFields(
+                    subsectionWithPath("id").description("Id of the one article"),
+                    subsectionWithPath("title").description("title of the one article"),
+                    subsectionWithPath("content").description("content of the one article"),
+                    subsectionWithPath("hits").description("hits of the one article"),
+                    subsectionWithPath("likes").description("likes of the one article"),
+                    subsectionWithPath("deleted").description("deleted of the one article"),
+                    subsectionWithPath("createdAt").description("createdAt of the one article"),
+                    subsectionWithPath("updatedAt").description("updatedAt of the one article")
+                )
+            )
+        );
+    }
 }
