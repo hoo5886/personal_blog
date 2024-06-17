@@ -4,6 +4,7 @@ import com.example.personal_blog.entity.Article;
 import com.example.personal_blog.repository.ArticleRepository;
 import com.example.personal_blog.model.dao.ArticleDao;
 import com.example.personal_blog.model.dto.ArticleDto;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -33,27 +34,28 @@ public class ArticleService {
     }
 
     public ArticleDto read(Long id) {
-        ArticleDao dao = ArticleDao.from(
+        var dao = ArticleDao.from(
             Objects.requireNonNull(articleRepository.findById(id).orElse(null)));
 
         return ArticleDto.from(dao);
     }
 
-    public void delete(ArticleDto dto) {
-        dto.setDeleted(true);
-        var entity = convertToEntity(dto);
+    public void delete(Long id) {
+        var entity = articleRepository.findById(id).orElse(null);
+        entity.setDeleted(true);
         articleRepository.save(entity);
     }
 
-    public String update(ArticleDto dto) {
+    public ArticleDto update(ArticleDto dto, Long id) {
         var entity = convertToEntity(dto);
-        articleRepository.findById(dto.getId()).ifPresent(article -> {
+        articleRepository.findById(id).ifPresent(article -> {
             article.setTitle(entity.getTitle());
             article.setContent(entity.getContent());
+            article.setUpdatedAt(LocalDateTime.now());
             articleRepository.save(article);
         });
 
-        return "수정된 글: " + dto.getId();
+        return ArticleDto.from(ArticleDao.from(entity));
     }
 
     public void addLike(ArticleDto dto) {
@@ -65,6 +67,8 @@ public class ArticleService {
     }
 
     public void write(ArticleDto dto) {
+        dto.setCreatedAt(LocalDateTime.now());
+        dto.setUpdatedAt(LocalDateTime.now());
         var entity = convertToEntity(dto);
         articleRepository.save(entity);
     }

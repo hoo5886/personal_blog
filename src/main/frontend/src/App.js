@@ -7,6 +7,7 @@ import {fetchHello, fetchArticles} from "./apis";
 import Articles from "./pages/Articles";
 import Hello from "./pages/Hello";
 import Write from "./pages/Write";
+import ArticleDetail from "./pages/ArticleDetail";
 
 function App() {
 
@@ -48,9 +49,9 @@ function App() {
                 <Route path="/hello" element={<Hello />} />
                 <Route path="/list" element={<Articles />} />
                 <Route path="/edit" element={<Write />} />
+                <Route path="/list/:id" element={<ArticleDetail/>} />
               </Routes>
             </div>
-
             <Tags className="sidebar" />
           </div>
         </div>
