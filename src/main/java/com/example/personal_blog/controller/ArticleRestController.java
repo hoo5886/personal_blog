@@ -34,9 +34,9 @@ public class ArticleRestController {
         return new ResponseEntity<>(service.read(id), HttpStatus.OK);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto) {
-        service.update(dto);
+    @PutMapping("/article/{id}/update")
+    public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto, @PathVariable Long id ){
+        service.update(dto, id);
         return new ResponseEntity<>("글 수정 완료", HttpStatus.OK);
     }
 
@@ -46,9 +46,9 @@ public class ArticleRestController {
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
-    @PutMapping("/delete")
-    public ResponseEntity<String> deleteArticle(@RequestBody ArticleDto dto) {
-        service.delete(dto);
+    @PutMapping("/article/{id}/delete")
+    public ResponseEntity<String> deleteArticle(@PathVariable Long id){
+        service.delete(id);
         return new ResponseEntity<>("글 삭제 완료", HttpStatus.OK);
     }
 }
