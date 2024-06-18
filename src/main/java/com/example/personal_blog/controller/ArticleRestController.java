@@ -1,6 +1,6 @@
 package com.example.personal_blog.controller;
 
-import com.example.personal_blog.model.dto.ArticleDto;
+import com.example.personal_blog.model.ArticleDto;
 import com.example.personal_blog.service.ArticleService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,31 +24,51 @@ public class ArticleRestController {
         return "Hello World!";
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<List<ArticleDto>> getArticleList() {
-        return new ResponseEntity<>(service.getArticleList(), HttpStatus.OK);
-    }
-
-    @GetMapping("/article/{id}")
-    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) {
-        return new ResponseEntity<>(service.read(id), HttpStatus.OK);
-    }
-
-    @PutMapping("/article/{id}/update")
-    public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto, @PathVariable Long id ){
-        service.update(dto, id);
-        return new ResponseEntity<>("글 수정 완료", HttpStatus.OK);
-    }
-
+    /**
+     * 게시글 작성
+     * @param dto
+     */
     @PostMapping("/write")
     public ResponseEntity<ArticleDto> writeArticle(@RequestBody ArticleDto dto) {
         service.write(dto);
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
-    @PutMapping("/article/{id}/delete")
-    public ResponseEntity<String> deleteArticle(@PathVariable Long id){
-        service.delete(id);
-        return new ResponseEntity<>("글 삭제 완료", HttpStatus.OK);
+    /**
+     * 게시글 목록 조회
+     * @return
+     */
+    @GetMapping("/articles")
+    public ResponseEntity<List<ArticleDto>> getArticleList() {
+        return new ResponseEntity<>(service.getArticleList(), HttpStatus.OK);
+    }
+
+    /**
+     * 특정 게시글 조회
+     * @param id
+     */
+    @GetMapping("/articles/{id}")
+    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) {
+        return new ResponseEntity<>(service.read(id), HttpStatus.OK);
+    }
+  
+    /**
+     * 특정 게시글 편집
+     * @param dto
+     */
+    @PutMapping("/articles/{id}/update")
+    public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto) {
+        String response = service.update(dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * 특정 게시글 삭제
+     * @param dto
+     */
+    @PutMapping("/articles/{id}/delete")
+    public ResponseEntity<String> deleteArticle(@RequestBody ArticleDto dto) {
+        String response = service.delete(dto);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }
