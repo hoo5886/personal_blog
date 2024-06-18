@@ -51,7 +51,7 @@ public class ArticleRestController {
     public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) {
         return new ResponseEntity<>(service.read(id), HttpStatus.OK);
     }
-
+  
     /**
      * 특정 게시글 편집
      * @param dto
