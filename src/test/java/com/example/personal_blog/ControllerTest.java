@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.personal_blog.controller.ArticleRestController;
-import com.example.personal_blog.model.dto.ArticleDto;
+import com.example.personal_blog.model.ArticleDto;
 import com.example.personal_blog.service.ArticleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
@@ -71,14 +71,15 @@ public class ControllerTest {
     @Test
     @DisplayName("게시글 작성")
     void write() throws Exception {
-        ArticleDto dto = new ArticleDto();
-        dto.setId(1L);
-        dto.setTitle("title");
-        dto.setContent("content");
-        dto.setHits(0);
-        dto.setLikes(0);
-        dto.setDeleted(false);
-        dto.setCreatedAt(LocalDateTime.now());
+        ArticleDto dto = ArticleDto.builder()
+            .id(1L)
+            .title("title")
+            .content("content")
+            .hits(0)
+            .likes(0)
+            .isDeleted(false)
+            .createdAt(LocalDateTime.now())
+            .build();
         String dtoJson = mapper.writeValueAsString(dto);
 
         this.mockMvc.perform(post("/write")
@@ -95,7 +96,7 @@ public class ControllerTest {
                     subsectionWithPath("content").description("Article Content"),
                     subsectionWithPath("hits").description("Article Hits"),
                     subsectionWithPath("likes").description("Article Likes"),
-                    subsectionWithPath("deleted").description("Article isDeleted"),
+                    subsectionWithPath("isDeleted").description("Article isDeleted"),
                     subsectionWithPath("createdAt").description("Article Created At"),
                     subsectionWithPath("updatedAt").description("Article Updated At")
                 )
@@ -125,14 +126,16 @@ public class ControllerTest {
 
         List<ArticleDto> dtoList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
-            ArticleDto dto = new ArticleDto();
-            dto.setId((long) i);
-            dto.setTitle("title" + i);
-            dto.setContent("content" + i);
-            dto.setHits(0);
-            dto.setLikes(0);
-            dto.setDeleted(false);
-            dto.setCreatedAt(LocalDateTime.now());
+            ArticleDto dto = ArticleDto.builder()
+                .id((long) i)
+                .title("title" + i)
+                .content("content" + i)
+                .hits(0)
+                .likes(0)
+                .isDeleted(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+
             dtoList.add(dto);
         }
         given(service.getArticleList()).willReturn(dtoList);
@@ -158,7 +161,7 @@ public class ControllerTest {
                     subsectionWithPath("[].content").description("content of the one article"),
                     subsectionWithPath("[].hits").description("hits of the one article"),
                     subsectionWithPath("[].likes").description("likes of the one article"),
-                    subsectionWithPath("[].deleted").description("deleted of the one article"),
+                    subsectionWithPath("[].isDeleted").description("deleted of the one article"),
                     subsectionWithPath("[].createdAt").description("createdAt of the one article"),
                     subsectionWithPath("[].updatedAt").description("updatedAt of the one article")
                 )
@@ -169,14 +172,15 @@ public class ControllerTest {
     @Test
     @DisplayName("게시글 조회")
     void read() throws Exception {
-        ArticleDto dto = new ArticleDto();
-        dto.setId(1L);
-        dto.setTitle("title");
-        dto.setContent("content");
-        dto.setHits(0);
-        dto.setLikes(0);
-        dto.setDeleted(false);
-        dto.setCreatedAt(LocalDateTime.now());
+        ArticleDto dto = ArticleDto.builder()
+            .id(1L)
+            .title("title")
+            .content("content")
+            .hits(0)
+            .likes(0)
+            .isDeleted(false)
+            .createdAt(LocalDateTime.now())
+            .build();
         given(service.read(1L)).willReturn(dto);
 
         this.mockMvc.perform(get("/article/1")
@@ -194,7 +198,7 @@ public class ControllerTest {
                     subsectionWithPath("content").description("content of the one article"),
                     subsectionWithPath("hits").description("hits of the one article"),
                     subsectionWithPath("likes").description("likes of the one article"),
-                    subsectionWithPath("deleted").description("deleted of the one article"),
+                    subsectionWithPath("isDeleted").description("deleted of the one article"),
                     subsectionWithPath("createdAt").description("createdAt of the one article"),
                     subsectionWithPath("updatedAt").description("updatedAt of the one article")
                 )
