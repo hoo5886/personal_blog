@@ -32,29 +32,41 @@ public class ArticleService {
         return ArticleDto.from(article);
     }
 
-    public String update(ArticleDto dto, Long id) {
-        articleRepository.findById(id).ifPresent(article -> {
-            article.setTitle(dto.title());
-            article.setContent(dto.content());
-            article.setUpdatedAt(LocalDateTime.now());
-            articleRepository.save(article);
-        });
+    public String update(ArticleDto dto) {
+        Article article = articleRepository.findById(dto.id())
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + dto.id()));
+
+        article.setTitle(dto.title());
+        article.setContent(dto.content());
+        articleRepository.save(article);
+
         return "수정된 글: " + dto.id();
     }
 
-    public String delete(Long id) {
-        articleRepository.findById(id).ifPresent(article -> {
-            article.setDeleted(true);
-            articleRepository.save(article);
-        });
-        return "게시글이 블라인드 처리됐습니다. :" + id;
+    public String delete(ArticleDto dto) {
+        Article article = articleRepository.findById(dto.id())
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + dto.id()));
+
+        article.setDeleted(true);
+        articleRepository.save(article);
+
+        return "게시글이 블라인드 처리됐습니다. :" + dto.id();
     }
 
-    public void addLike(ArticleDto dto) {
-        articleRepository.findById(dto.id()).ifPresent(article -> {
-            article.setLikes(dto.likes() + 1);
-            articleRepository.save(article);
-        });
+    public void addLike(Long id) {
+        Article article = articleRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
+        article.setLikes(article.getLikes() + 1);
+        articleRepository.save(article);
+    }
+
+    public void cancelLike(Long id) {
+        Article article = articleRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
+
+        article.setLikes(article.getLikes() - 1);
+
+        articleRepository.save(article);
     }
 
     public void write(ArticleDto dto) {
