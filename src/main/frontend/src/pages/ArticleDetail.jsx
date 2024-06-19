@@ -13,6 +13,8 @@ const ArticleDetail = () => {
   const [editContent, setEditContent] = useState('');
   const [editTitle, setEditTitle] = useState('');
   const navigate = useNavigate();
+  const [likes, setLikes] = useState(0);
+  const [isLikes, setIsLikes] = useState(false);
 
   useEffect(() => {
     const fetchArticle = async () => {
@@ -21,6 +23,7 @@ const ArticleDetail = () => {
         setArticle(response.data);
         setEditTitle(response.data.title); // 제목을 수정할 수 있도록 수정
         setEditContent(response.data.content);
+        // setIsLikes(response.data.isLikedByUser); // 서버에서 현재 사용자가 좋아요를 눌렀는지 여부를 받아와야 합니다.
       } catch (error) {
         setError('Error fetching article data');
         console.error('Error fetching article data:', error);
@@ -30,6 +33,23 @@ const ArticleDetail = () => {
     };
 
     fetchArticle();
+  }, [id]);
+
+  useEffect(() => {
+    // 처음 로드될 때 서버에서 좋아요 상태를 가져오는 로직을 추가해야 합니다.
+    const fetchLikes = async () => {
+      try {
+        const response = await axios.get(`/articles/${id}`);
+        if (response.status === 200) {
+          setLikes(response.data.likes);
+          setIsLikes(response.data.isLikedByUser); // 서버에서 현재 사용자가 좋아요를 눌렀는지 여부를 받아와야 합니다.
+        }
+      } catch (error) {
+        console.error('Error fetching article details:', error);
+      }
+    };
+
+    fetchLikes();
   }, [id]);
 
   const handleSave = async () => {
@@ -60,6 +80,35 @@ const ArticleDetail = () => {
         console.error('Error deleting article:', error);
         alert('글을 삭제하는 데 실패했습니다.');
       }
+    }
+  };
+
+  const handleLike = async () => {
+    try {
+      if (!isLikes) {
+        const response = await axios.put(`/articles/${id}/like`);
+        if (response.status === 200) {
+          setArticle((prevArticle) => ({
+            ...prevArticle,
+            likes: prevArticle.likes + 1,
+          }));
+          alert('좋아요를 눌렀습니다.');
+          setIsLikes(true);
+        }
+      } else {
+        const response = await axios.put(`/articles/${id}/cancel-like`);
+        if (response.status === 200) {
+          setArticle((prevArticle) => ({
+            ...prevArticle,
+            likes: prevArticle.likes - 1,
+          }));
+          alert('좋아요를 취소했습니다.');
+          setIsLikes(false);
+        }
+      }
+    } catch (error) {
+      console.error('Error liking article:', error);
+      alert('좋아요를 누르는 데 실패했습니다.');
     }
   };
 
@@ -94,6 +143,14 @@ const ArticleDetail = () => {
         )}
         <button onClick={() => navigate(-1)}>뒤로가기</button> {/* 뒤로가기 버튼 추가 */}
         <button onClick={handleDelete}>삭제</button>
+        {
+          isLikes ? (
+            <button onClick={handleLike}>좋아요 취소</button>
+          ) : (
+            <button onClick={handleLike}>좋아요</button>
+
+          )
+        }
       </div>
   );
 }
