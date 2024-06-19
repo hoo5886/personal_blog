@@ -32,9 +32,9 @@ public class ArticleService {
         return ArticleDto.from(article);
     }
 
-    public String update(ArticleDto dto) {
-        Article article = articleRepository.findById(dto.id())
-            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + dto.id()));
+    public String update(ArticleDto dto, Long id) {
+        Article article = articleRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
 
         article.setTitle(dto.title());
         article.setContent(dto.content());
@@ -43,14 +43,14 @@ public class ArticleService {
         return "수정된 글: " + dto.id();
     }
 
-    public String delete(ArticleDto dto) {
-        Article article = articleRepository.findById(dto.id())
-            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + dto.id()));
+    public String delete(Long id) {
+        Article article = articleRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
 
         article.setDeleted(true);
         articleRepository.save(article);
 
-        return "게시글이 블라인드 처리됐습니다. :" + dto.id();
+        return "게시글이 블라인드 처리됐습니다. :" + id;
     }
 
     public void addLike(Long id) {

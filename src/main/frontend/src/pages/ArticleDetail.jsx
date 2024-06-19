@@ -12,7 +12,7 @@ const ArticleDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
   const [editTitle, setEditTitle] = useState('');
-  const navigate = useNavigate(); // useNavigate 훅을 사용하여 네비게이트 객체 생성
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchArticle = async () => {
