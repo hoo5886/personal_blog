@@ -4,6 +4,7 @@ import com.example.personal_blog.entity.Article;
 import com.example.personal_blog.repository.ArticleRepository;
 import com.example.personal_blog.model.ArticleDto;
 import jakarta.persistence.EntityNotFoundException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,6 @@ public class ArticleService {
         for (Article article : entity) {
            dtoList.add(ArticleDto.from(article));
         }
-
         return dtoList;
     }
 
@@ -32,23 +32,22 @@ public class ArticleService {
         return ArticleDto.from(article);
     }
 
-    public String update(ArticleDto dto) {
-        articleRepository.findById(dto.id()).ifPresent(article -> {
+    public String update(ArticleDto dto, Long id) {
+        articleRepository.findById(id).ifPresent(article -> {
             article.setTitle(dto.title());
             article.setContent(dto.content());
+            article.setUpdatedAt(LocalDateTime.now());
             articleRepository.save(article);
         });
-
         return "수정된 글: " + dto.id();
     }
 
-    public String delete(ArticleDto dto) {
-        articleRepository.findById(dto.id()).ifPresent(article -> {
+    public String delete(Long id) {
+        articleRepository.findById(id).ifPresent(article -> {
             article.setDeleted(true);
             articleRepository.save(article);
         });
-
-        return "게시글이 블라인드 처리됐습니다. :" + dto.id();
+        return "게시글이 블라인드 처리됐습니다. :" + id;
     }
 
     public void addLike(ArticleDto dto) {
