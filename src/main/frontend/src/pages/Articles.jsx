@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 const Articles = () => {
   const [list, setList] = useState([]);
   const [isDeleted, setIsDeleted] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -18,6 +19,10 @@ const Articles = () => {
 
     fetchArticles();
   }, []);
+
+  const handleWriteClick = () => {
+    navigate('/write');
+  }
 
   return (
       <div>
@@ -34,6 +39,7 @@ const Articles = () => {
               </li>
           ))}
         </ul>
+        <button onClick={handleWriteClick}>글쓰기</button>
       </div>
   );
 }

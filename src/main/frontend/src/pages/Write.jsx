@@ -46,7 +46,7 @@ function Write() {
         alert("작성이 완료되었습니다.");
         setContent("");
         document.getElementById("title").value = "";
-        window.location.href = "/list";
+        window.location.href = "/articles";
       } else {
         alert("작성에 실패했습니다.");
       }

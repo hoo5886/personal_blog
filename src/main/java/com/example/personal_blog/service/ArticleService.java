@@ -38,6 +38,7 @@ public class ArticleService {
 
         article.setTitle(dto.title());
         article.setContent(dto.content());
+        article.setUpdatedAt(LocalDateTime.now());
         articleRepository.save(article);
 
         return "수정된 글: " + dto.id();
