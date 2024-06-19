@@ -17,7 +17,7 @@ const ArticleDetail = () => {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await axios.get(`/article/${id}`);
+        const response = await axios.get(`/articles/${id}`);
         setArticle(response.data);
         setEditTitle(response.data.title); // 제목을 수정할 수 있도록 수정
         setEditContent(response.data.content);
@@ -34,7 +34,7 @@ const ArticleDetail = () => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.put(`/article/${id}/update`, { title: editTitle, content: editContent });
+      const response = await axios.put(`/articles/${id}/update`, { title: editTitle, content: editContent });
       if (response.status === 200) {
         setArticle({ ...article, title: editTitle, content: editContent });
         setIsEditing(false);
@@ -48,7 +48,7 @@ const ArticleDetail = () => {
 
   const handleDelete = async () => {
     try {
-      const response = await axios.put(`/article/${id}/delete`);
+      const response = await axios.put(`/articles/${id}/delete`);
       if (response.status === 200) {
         alert('글이 성공적으로 삭제되었습니다.');
         navigate('/list'); // 글 삭제 후 목록 페이지로 리디렉션

@@ -47,9 +47,9 @@ function App() {
             <div className="content">
               <Routes>
                 <Route path="/hello" element={<Hello />} />
-                <Route path="/list" element={<Articles />} />
-                <Route path="/edit" element={<Write />} />
-                <Route path="/list/:id" element={<ArticleDetail/>} />
+                <Route path="/articles" element={<Articles />} />
+                <Route path="/write" element={<Write />} />
+                <Route path="/articles/:id" element={<ArticleDetail/>} />
               </Routes>
             </div>
             <Tags className="sidebar" />

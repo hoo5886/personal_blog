@@ -8,7 +8,7 @@ const Articles = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await axios.get('/list');
+        const response = await axios.get('/articles');
         setList(response.data);
       } catch (error) {
         console.error('Error fetching list data:', error);
@@ -25,7 +25,7 @@ const Articles = () => {
           {list.map((item) => (
               <li key={item.id}>
                 <h3>
-                  <Link to={`/list/${item.id}`}>{item.title}</Link>
+                  <Link to={`/articles/${item.id}`}>{item.title}</Link>
                 </h3>
                 <p>Likes: {item.likes}</p>
                 <p>Created At: {item.createdAt}</p>
