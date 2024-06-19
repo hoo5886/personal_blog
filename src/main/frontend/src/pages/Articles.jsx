@@ -4,6 +4,7 @@ import {Link} from "react-router-dom";
 
 const Articles = () => {
   const [list, setList] = useState([]);
+  const [isDeleted, setIsDeleted] = useState(false);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -22,7 +23,7 @@ const Articles = () => {
       <div>
         <h2>List from Backend</h2>
         <ul>
-          {list.map((item) => (
+          {list.filter(item => !item.isDeleted).map((item) => (
               <li key={item.id}>
                 <h3>
                   <Link to={`/articles/${item.id}`}>{item.title}</Link>

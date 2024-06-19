@@ -25,7 +25,7 @@ function App() {
       }
     };
 
-    // /list 엔드포인트 호출
+    // /articles 엔드포인트 호출
     const getArticlesData = async () => {
       try {
         const data = await fetchArticles();
