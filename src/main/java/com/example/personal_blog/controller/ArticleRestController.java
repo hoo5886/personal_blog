@@ -71,4 +71,24 @@ public class ArticleRestController {
         String response = service.delete(dto);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    /**
+     * 게시글 좋아요
+     * @param id
+     */
+    @PutMapping("/articles/{id}/like")
+    public ResponseEntity<String> likeArticle(@PathVariable Long id) {
+        service.addLike(id);
+        return new ResponseEntity<>("Likes!", HttpStatus.OK);
+    }
+
+    /**
+     * 게시글 좋아요 취소
+     * @param id
+     */
+    @PutMapping("/articles/{id}/cancel-like")
+    public ResponseEntity<String> cancelLikeArticle(@PathVariable Long id) {
+        service.cancelLike(id);
+        return new ResponseEntity<>("Likes canceled", HttpStatus.OK);
+    }
 }

@@ -1,9 +1,11 @@
 package com.example.personal_blog;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -50,10 +52,25 @@ public class ControllerTest {
     @MockBean
     private ArticleService service;
 
+    ArticleDto dto;
+
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply(documentationConfiguration(restDocumentation))
+            .build();
+    }
+
+    @BeforeEach
+    void dto() {
+        dto = ArticleDto.builder()
+            .id(1L)
+            .title("title")
+            .content("content")
+            .hits(0)
+            .likes(0)
+            .isDeleted(false)
+            .createdAt(LocalDateTime.now())
             .build();
     }
 
@@ -71,15 +88,6 @@ public class ControllerTest {
     @Test
     @DisplayName("게시글 작성")
     void write() throws Exception {
-        ArticleDto dto = ArticleDto.builder()
-            .id(1L)
-            .title("title")
-            .content("content")
-            .hits(0)
-            .likes(0)
-            .isDeleted(false)
-            .createdAt(LocalDateTime.now())
-            .build();
         String dtoJson = mapper.writeValueAsString(dto);
 
         this.mockMvc.perform(post("/write")
@@ -107,7 +115,7 @@ public class ControllerTest {
     @Test
     @DisplayName("게시글 리스트 조회 (null)")
     void find() throws Exception {
-        this.mockMvc.perform(get("/list")
+        this.mockMvc.perform(get("/articles")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
@@ -140,7 +148,7 @@ public class ControllerTest {
         }
         given(service.getArticleList()).willReturn(dtoList);
 
-        this.mockMvc.perform(get("/list")
+        this.mockMvc.perform(get("/articles")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$[0].id").value(0L))
@@ -154,7 +162,7 @@ public class ControllerTest {
             .andExpect(jsonPath("$[2].content").value("content2"))
             .andDo(print())
             .andExpect(status().isOk())
-            .andDo(document("/list",
+            .andDo(document("/articles",
                 responseFields(
                     subsectionWithPath("[].id").description("Id of the one article"),
                     subsectionWithPath("[].title").description("title of the one article"),
@@ -172,18 +180,9 @@ public class ControllerTest {
     @Test
     @DisplayName("게시글 조회")
     void read() throws Exception {
-        ArticleDto dto = ArticleDto.builder()
-            .id(1L)
-            .title("title")
-            .content("content")
-            .hits(0)
-            .likes(0)
-            .isDeleted(false)
-            .createdAt(LocalDateTime.now())
-            .build();
         given(service.read(1L)).willReturn(dto);
 
-        this.mockMvc.perform(get("/article/1")
+        this.mockMvc.perform(get("/articles/1")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id").value(1L))
@@ -204,5 +203,33 @@ public class ControllerTest {
                 )
             )
         );
+    }
+
+    @Test
+    @DisplayName("좋아요 추가")
+    void like() throws Exception {
+        willDoNothing().given(service).addLike(1L);
+
+        this.mockMvc.perform(put("/articles/1/like")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string("Likes!"))
+            .andDo(document("/articles/{id}/like"));
+    }
+
+    @Test
+    @DisplayName("좋아요 취소")
+    void hate() throws Exception {
+        willDoNothing().given(service).cancelLike(1L);
+
+        this.mockMvc.perform(put("/articles/{id}/cancel-like")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string("Likes cancel"))
+            .andDo(document("/articles/{id}/cancel-like"));
     }
 }
