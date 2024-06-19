@@ -14,6 +14,6 @@ export const fetchHello = async () => {
 
 // /list 엔드포인트 호출 함수
 export const fetchArticles = async () => {
-  const response = await api.get('/list');
+  const response = await api.get('/articles');
   return response.data;
 };

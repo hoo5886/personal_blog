@@ -57,18 +57,18 @@ public class ArticleRestController {
      * @param dto
      */
     @PutMapping("/articles/{id}/update")
-    public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto) {
-        String response = service.update(dto);
+    public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto, @PathVariable Long id) {
+        String response = service.update(dto, id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
      * 특정 게시글 삭제
-     * @param dto
+     * @param id
      */
     @PutMapping("/articles/{id}/delete")
-    public ResponseEntity<String> deleteArticle(@RequestBody ArticleDto dto) {
-        String response = service.delete(dto);
+    public ResponseEntity<String> deleteArticle(@PathVariable Long id) {
+        String response = service.delete(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

@@ -17,7 +17,7 @@ const ArticleDetail = () => {
   useEffect(() => {
     const fetchArticle = async () => {
       try {
-        const response = await axios.get(`/article/${id}`);
+        const response = await axios.get(`/articles/${id}`);
         setArticle(response.data);
         setEditTitle(response.data.title); // 제목을 수정할 수 있도록 수정
         setEditContent(response.data.content);
@@ -34,7 +34,7 @@ const ArticleDetail = () => {
 
   const handleSave = async () => {
     try {
-      const response = await axios.put(`/article/${id}/update`, { title: editTitle, content: editContent });
+      const response = await axios.put(`/articles/${id}/update`, { title: editTitle, content: editContent });
       if (response.status === 200) {
         setArticle({ ...article, title: editTitle, content: editContent });
         setIsEditing(false);
@@ -47,15 +47,19 @@ const ArticleDetail = () => {
   };
 
   const handleDelete = async () => {
-    try {
-      const response = await axios.put(`/article/${id}/delete`);
-      if (response.status === 200) {
-        alert('글이 성공적으로 삭제되었습니다.');
-        navigate('/list'); // 글 삭제 후 목록 페이지로 리디렉션
+    const confirmDelete = window.confirm('정말로 글을 삭제하시겠습니까?');
+    if (confirmDelete) {
+      try {
+        const response = await axios.put(`/articles/${id}/delete`,
+            {isDeleted: true});
+        if (response.status === 200) {
+          alert('글이 성공적으로 삭제되었습니다.');
+          navigate('/articles'); // 글 삭제 후 목록 페이지로 리디렉션
+        }
+      } catch (error) {
+        console.error('Error deleting article:', error);
+        alert('글을 삭제하는 데 실패했습니다.');
       }
-    } catch (error) {
-      console.error('Error deleting article:', error);
-      alert('글을 삭제하는 데 실패했습니다.');
     }
   };
 
@@ -89,6 +93,7 @@ const ArticleDetail = () => {
             <button onClick={() => setIsEditing(true)}>편집</button>
         )}
         <button onClick={() => navigate(-1)}>뒤로가기</button> {/* 뒤로가기 버튼 추가 */}
+        <button onClick={handleDelete}>삭제</button>
       </div>
   );
 }
