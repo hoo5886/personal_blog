@@ -2,16 +2,18 @@ package com.example.personal_blog.model;
 
 import com.example.personal_blog.entity.Article;
 import java.time.LocalDateTime;
+import java.util.Set;
 import lombok.Builder;
 
 @Builder
 public record ArticleDto(
-    Long id,
+    Long articleId,
     String title,
     String content,
     long hits,
     int likes,
     boolean isDeleted,
+    Set<ContentPathDto> contentPaths,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
@@ -22,13 +24,13 @@ public record ArticleDto(
         }
     }
     public ArticleDto withIsDeleted(boolean isDeleted) {
-        return new ArticleDto(id, title, content, hits, likes, isDeleted, createdAt, updatedAt);
+        return new ArticleDto(articleId, title, content, hits, likes, isDeleted, contentPaths, createdAt, updatedAt);
     }
 
     //
     public static ArticleDto from(Article article) {
         return ArticleDto.builder()
-            .id(article.getId())
+            .articleId(article.getArticleId())
             .title(article.getTitle())
             .content(article.getContent())
             .hits(article.getHits())
@@ -41,7 +43,7 @@ public record ArticleDto(
 
     public static Article to(ArticleDto dto) {
         return Article.builder()
-                .id(dto.id())
+                .articleId(dto.articleId())
                 .title(dto.title())
                 .content(dto.content())
                 .likes(dto.likes())

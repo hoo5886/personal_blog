@@ -6,7 +6,7 @@ const Header = () => {
         <div className="header_left">개인 블로그</div>
         <div className="header_right">
           <div className="img_section">
-            <img src="../resources/mhface.jpg"/>
+            {/*<img src="../resources/mhface.jpg"/>*/}
           </div>
           <div className="info_section">
             김명후

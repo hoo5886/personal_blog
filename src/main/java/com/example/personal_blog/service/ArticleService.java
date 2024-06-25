@@ -1,10 +1,9 @@
 package com.example.personal_blog.service;
 
 import com.example.personal_blog.entity.Article;
-import com.example.personal_blog.repository.ArticleRepository;
 import com.example.personal_blog.model.ArticleDto;
+import com.example.personal_blog.repository.ArticleRepository;
 import jakarta.persistence.EntityNotFoundException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +25,12 @@ public class ArticleService {
         return dtoList;
     }
 
-    public ArticleDto read(Long id) {
-        var article = articleRepository.findById(id)
+    public ArticleDto read(Long articleId) {
+        var article = articleRepository.findById(articleId)
             .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
+        article.setHits(article.getHits() + 1);
+        articleRepository.save(article);
+
         return ArticleDto.from(article);
     }
 
@@ -41,7 +43,7 @@ public class ArticleService {
         article.setUpdatedAt(LocalDateTime.now());
         articleRepository.save(article);
 
-        return "수정된 글: " + dto.id();
+        return "수정된 글: " + dto.articleId();
     }
 
     public String delete(Long id) {
@@ -70,8 +72,10 @@ public class ArticleService {
         articleRepository.save(article);
     }
 
-    public void write(ArticleDto dto) {
+    public ArticleDto write(ArticleDto dto) {
         var article = ArticleDto.to(dto);
         articleRepository.save(article);
+
+        return ArticleDto.from(article);
     }
 }
