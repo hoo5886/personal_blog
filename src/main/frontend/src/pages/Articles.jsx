@@ -24,9 +24,9 @@ const Articles = () => {
         <h2>List from Backend</h2>
         <ul>
           {list.filter(item => !item.isDeleted).map((item) => (
-              <li key={item.id}>
+              <li key={item.articleId}>
                 <h3>
-                  <Link to={`/articles/${item.id}`}>{item.title}</Link>
+                  <Link to={`/articles/${item.articleId}`}>{item.title}</Link>
                 </h3>
                 <p>Likes: {item.likes}</p>
                 <p>Created At: {item.createdAt}</p>
