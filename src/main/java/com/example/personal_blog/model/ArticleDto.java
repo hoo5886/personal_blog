@@ -2,7 +2,9 @@ package com.example.personal_blog.model;
 
 import com.example.personal_blog.entity.Article;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.Builder;
 
 @Builder
@@ -22,9 +24,10 @@ public record ArticleDto(
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
-    }
-    public ArticleDto withIsDeleted(boolean isDeleted) {
-        return new ArticleDto(articleId, title, content, hits, likes, isDeleted, contentPaths, createdAt, updatedAt);
+
+        if (contentPaths == null) {
+            contentPaths = new HashSet<>();
+        }
     }
 
     //
@@ -35,6 +38,9 @@ public record ArticleDto(
             .content(article.getContent())
             .hits(article.getHits())
             .likes(article.getLikes())
+            .contentPaths(article.getContentPaths().stream()
+                .map(ContentPathDto::from)
+                .collect(Collectors.toSet()))
             .isDeleted(article.isDeleted())
             .createdAt(article.getCreatedAt())
             .updatedAt(article.getUpdatedAt())
@@ -46,8 +52,11 @@ public record ArticleDto(
                 .articleId(dto.articleId())
                 .title(dto.title())
                 .content(dto.content())
-                .likes(dto.likes())
                 .hits(dto.hits())
+                .likes(dto.likes())
+                .contentPaths(dto.contentPaths().stream()
+                    .map(ContentPathDto::to)
+                    .collect(Collectors.toSet()))
                 .isDeleted(dto.isDeleted())
                 .createdAt(dto.createdAt())
                 .updatedAt(dto.updatedAt())

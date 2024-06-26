@@ -1,5 +1,6 @@
 package com.example.personal_blog.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,14 +26,17 @@ public class ContentPath {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "content_path_id")
     private Long contentPathId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "article_id")
     private Article article;
 
+    @Column(name = "content_path")
     private String contentPath;
 
     @CreatedDate
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 }

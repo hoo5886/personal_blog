@@ -28,7 +28,6 @@ const ArticleDetail = () => {
         setLoading(false);
       }
     };
-
     fetchArticle();
   }, [id]);
 
