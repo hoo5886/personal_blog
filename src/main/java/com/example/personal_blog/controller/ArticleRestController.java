@@ -2,22 +2,28 @@ package com.example.personal_blog.controller;
 
 import com.example.personal_blog.model.ArticleDto;
 import com.example.personal_blog.service.ArticleService;
+import com.example.personal_blog.service.ContentPathService;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
 public class ArticleRestController {
 
-    private final ArticleService service;
+    private final ArticleService articleService;
+    private final ContentPathService contentPathService;
 
     @GetMapping("/hello")
     public String home() {
@@ -29,8 +35,21 @@ public class ArticleRestController {
      * @param dto
      */
     @PostMapping("/write")
-    public ResponseEntity<ArticleDto> writeArticle(@RequestBody ArticleDto dto) {
-        service.write(dto);
+    @Transactional
+    public ResponseEntity<ArticleDto> writeArticle(
+        @RequestPart("article") ArticleDto dto,
+        @RequestPart(value = "files", required = false) MultipartFile[] files) throws IOException {
+
+        ArticleDto savedDto = articleService.write(dto);
+
+        if (files != null) {
+            for (MultipartFile file : files) {
+                contentPathService.saveImages(file, savedDto);
+            }
+        } else {
+            System.out.println("No files attached");
+        }
+
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
@@ -40,7 +59,7 @@ public class ArticleRestController {
      */
     @GetMapping("/articles")
     public ResponseEntity<List<ArticleDto>> getArticleList() {
-        return new ResponseEntity<>(service.getArticleList(), HttpStatus.OK);
+        return new ResponseEntity<>(articleService.getArticleList(), HttpStatus.OK);
     }
 
     /**
@@ -48,8 +67,10 @@ public class ArticleRestController {
      * @param id
      */
     @GetMapping("/articles/{id}")
-    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) {
-        return new ResponseEntity<>(service.read(id), HttpStatus.OK);
+    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) throws IOException {
+
+
+        return new ResponseEntity<>(articleService.read(id), HttpStatus.OK);
     }
   
     /**
@@ -58,7 +79,7 @@ public class ArticleRestController {
      */
     @PutMapping("/articles/{id}/update")
     public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto, @PathVariable Long id) {
-        String response = service.update(dto, id);
+        String response = articleService.update(dto, id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -68,7 +89,7 @@ public class ArticleRestController {
      */
     @PutMapping("/articles/{id}/delete")
     public ResponseEntity<String> deleteArticle(@PathVariable Long id) {
-        String response = service.delete(id);
+        String response = articleService.delete(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -78,7 +99,7 @@ public class ArticleRestController {
      */
     @PutMapping("/articles/{id}/like")
     public ResponseEntity<String> likeArticle(@PathVariable Long id) {
-        service.addLike(id);
+        articleService.addLike(id);
         return new ResponseEntity<>("Likes!", HttpStatus.OK);
     }
 
@@ -88,7 +109,7 @@ public class ArticleRestController {
      */
     @PutMapping("/articles/{id}/cancel-like")
     public ResponseEntity<String> cancelLikeArticle(@PathVariable Long id) {
-        service.cancelLike(id);
+        articleService.cancelLike(id);
         return new ResponseEntity<>("Likes canceled", HttpStatus.OK);
     }
 }

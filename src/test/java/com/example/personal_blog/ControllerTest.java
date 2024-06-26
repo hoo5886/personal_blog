@@ -64,7 +64,7 @@ public class ControllerTest {
     @BeforeEach
     void dto() {
         dto = ArticleDto.builder()
-            .id(1L)
+            .articleId(1L)
             .title("title")
             .content("content")
             .hits(0)
@@ -135,7 +135,7 @@ public class ControllerTest {
         List<ArticleDto> dtoList = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
             ArticleDto dto = ArticleDto.builder()
-                .id((long) i)
+                .articleId((long) i)
                 .title("title" + i)
                 .content("content" + i)
                 .hits(0)
