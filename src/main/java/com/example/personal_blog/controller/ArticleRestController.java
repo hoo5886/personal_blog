@@ -44,7 +44,7 @@ public class ArticleRestController {
 
         if (files != null) {
             for (MultipartFile file : files) {
-                contentPathService.saveImageToStorage(file, savedDto);
+                contentPathService.saveImages(file, savedDto);
             }
         } else {
             System.out.println("No files attached");
@@ -67,7 +67,9 @@ public class ArticleRestController {
      * @param id
      */
     @GetMapping("/articles/{id}")
-    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) {
+    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) throws IOException {
+
+
         return new ResponseEntity<>(articleService.read(id), HttpStatus.OK);
     }
   

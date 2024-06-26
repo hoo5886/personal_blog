@@ -7,7 +7,7 @@ import lombok.Builder;
 @Builder
 public record ContentPathDto(
     Long contentPathId,
-    Long articleId,
+    ArticleDto articleDto,
     String path,
     LocalDateTime createdAt
 ) {
@@ -17,14 +17,10 @@ public record ContentPathDto(
             }
         }
 
-        public ContentPathDto withArticleId(Long articleId) {
-            return new ContentPathDto(contentPathId, articleId, path, createdAt);
-        }
-
         public static ContentPathDto from(ContentPath contentPath) {
             return ContentPathDto.builder()
                 .contentPathId(contentPath.getContentPathId())
-                .articleId(contentPath.getArticle().getArticleId())
+                .articleDto(ArticleDto.from(contentPath.getArticle()))
                 .path(contentPath.getContentPath())
                 .createdAt(contentPath.getCreatedAt())
                 .build();
@@ -38,5 +34,4 @@ public record ContentPathDto(
                     .createdAt(dto.createdAt())
                     .build();
         }
-
 }

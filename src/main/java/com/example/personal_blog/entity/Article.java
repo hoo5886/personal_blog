@@ -3,6 +3,7 @@ package com.example.personal_blog.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -30,21 +31,37 @@ public class Article {
     @Column(name = "article_id")
     private Long articleId;
 
+    @Column(name = "title")
     private String title;
 
-    @Column(columnDefinition = "MEDIUMTEXT")
+    @Column(columnDefinition = "MEDIUMTEXT", name = "content")
     private String content;
 
+    @Column(name = "hits")
     private long hits; //조회수
+
+    @Column(name = "likes")
     private int likes; //공감
+
+    @Column(name = "is_deleted")
     private boolean isDeleted; //삭제여부
 
-    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "article",
+        cascade = CascadeType.ALL,
+//        orphanRemoval = true,
+        fetch = FetchType.LAZY)
     private Set<ContentPath> contentPaths;
 
     @CreatedDate
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public void addContentPath(ContentPath contentPath) {
+        contentPaths.add(contentPath);
+        contentPath.setArticle(this);
+    }
 }
