@@ -7,6 +7,7 @@ import com.example.personal_blog.model.ContentPathDto;
 import com.example.personal_blog.repository.ArticleRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,6 +24,10 @@ public class ArticleService {
 
     private final ContentPathService contentPathService;
 
+    /**
+     * 게시글 목록 조회
+     * @return
+     */
     public List<ArticleDto> getArticleList() {
         List<Article> entity = articleRepository.findAll();
         List<ArticleDto> dtoList = new ArrayList<>();
@@ -33,6 +38,13 @@ public class ArticleService {
         return dtoList;
     }
 
+    /**
+     * 게시글 조회
+     *
+     * @param articleId
+     * @return ArticleDto
+     * @throws IOException
+     */
     public ArticleDto read(Long articleId) throws IOException {
         var article = articleRepository.findById(articleId)
             .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
@@ -41,21 +53,21 @@ public class ArticleService {
         article.setHits(article.getHits() + 1);
 
         //ContentPath로부터 이미지 가져오기.
-        Set<ContentPathDto> contentPaths = contentPathService.getImagePaths(articleId);
-        for (ContentPathDto contentPath : contentPaths) {
-            contentPath.path();
+        Set<ContentPathDto> contentPathDtos = contentPathService.getImagePaths(articleId);
+        for (ContentPathDto contentPath : contentPathDtos) {
+            article.addContentPath(ContentPathDto.to(contentPath));
         }
-
-        Set<ContentPath> contentPathSet = contentPaths.stream()
-            .map(ContentPathDto::to)
-            .collect(Collectors.toSet());
-
-        article.setContentPaths(contentPathSet);
         articleRepository.save(article);
 
         return ArticleDto.from(article);
     }
 
+    /**
+     * 게시글 수정
+     * @param dto
+     * @param id
+     * @return
+     */
     public String update(ArticleDto dto, Long id) {
         var article = articleRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
@@ -68,6 +80,11 @@ public class ArticleService {
         return "수정된 글: " + dto.articleId();
     }
 
+    /**
+     * 게시글 삭제
+     * @param id
+     * @return
+     */
     public String delete(Long id) {
         var article = articleRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
