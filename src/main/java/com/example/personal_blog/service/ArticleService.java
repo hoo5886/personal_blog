@@ -111,6 +111,12 @@ public class ArticleService {
         articleRepository.save(article);
     }
 
+
+    /**
+     * 게시글 작성
+     * @param articleDto
+     * @return
+     */
     public ArticleDto write(ArticleDto articleDto) {
         var article = ArticleDto.to(articleDto);
         articleRepository.save(article);
