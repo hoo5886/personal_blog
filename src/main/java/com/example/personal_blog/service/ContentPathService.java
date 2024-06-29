@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,10 @@ public class ContentPathService {
 
     public Set<ContentPathDto> getImagePaths(Long articleId) {
         Set<ContentPath> contentPaths = contentPathRepository.findByArticleId(articleId);
+
+        if (contentPaths.isEmpty() || contentPaths == null) {
+            return new HashSet<>();
+        }
 
         return contentPaths.stream()
             .map(ContentPathDto::from)

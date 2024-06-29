@@ -64,4 +64,9 @@ public class Article {
         contentPaths.add(contentPath);
         contentPath.setArticle(this);
     }
+
+    public void removeContentPath(ContentPath contentPath) {
+        contentPaths.remove(contentPath);
+        contentPath.setArticle(null);
+    }
 }

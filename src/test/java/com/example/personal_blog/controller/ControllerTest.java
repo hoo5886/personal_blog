@@ -1,4 +1,4 @@
-package com.example.personal_blog;
+package com.example.personal_blog.controller;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.personal_blog.controller.ArticleRestController;
 import com.example.personal_blog.model.ArticleDto;
 import com.example.personal_blog.service.ArticleService;
 import com.fasterxml.jackson.databind.ObjectMapper;
