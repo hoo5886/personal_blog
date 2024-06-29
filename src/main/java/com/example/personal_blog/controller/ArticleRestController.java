@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,11 +42,7 @@ public class ArticleRestController {
         ArticleDto savedDto = articleService.write(dto);
 
         if (files != null) {
-            for (MultipartFile file : files) {
-                contentPathService.saveImages(file, savedDto);
-            }
-        } else {
-            System.out.println("No files attached");
+            contentPathService.saveImages(files, savedDto);
         }
 
         return new ResponseEntity<>(dto, HttpStatus.CREATED);
@@ -64,22 +59,35 @@ public class ArticleRestController {
 
     /**
      * 특정 게시글 조회
-     * @param id
+     * @param articleId
      */
-    @GetMapping("/articles/{id}")
-    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long id) throws IOException {
+    @GetMapping("/articles/{articleId}")
+    public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long articleId) throws IOException {
+        var articleDto = articleService.read(articleId);
 
-
-        return new ResponseEntity<>(articleService.read(id), HttpStatus.OK);
+        return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
   
     /**
      * 특정 게시글 편집
+     * 게시글 편집 후 '저장'버튼을 누르면 수정된 게시글을 ArticleDto으로 클라이언트로부터 가져온다.
+     * ArticleDto에 담겨있는 정보에 더해 이미지 정보까지 업데이트한다.
+     * 이미지 업데이트는 해당 글이 가지고 있는 이미지를 일괄 삭제 후, 다시 저장하는 방식으로 한다.
+     * @param articleId
      * @param dto
      */
-    @PutMapping("/articles/{id}/update")
-    public ResponseEntity<String> updateArticle(@RequestBody ArticleDto dto, @PathVariable Long id) {
-        String response = articleService.update(dto, id);
+    @PostMapping("/articles/{articleId}/update")
+    public ResponseEntity<String> updateArticle(@RequestPart("article") ArticleDto dto,
+                                                @PathVariable Long articleId,
+                                                @RequestPart(value = "files", required = false) MultipartFile[] files) throws IOException{
+        var savedDto = articleService.read(articleId);
+//        var contentPaths = savedDto.contentPaths();
+
+        String response = articleService.update(dto, articleId);
+        if (files != null) {
+            contentPathService.updateImages(files, savedDto);
+        }
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
