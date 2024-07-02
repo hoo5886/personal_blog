@@ -143,14 +143,14 @@ public class ControllerTest {
     @Test
     @DisplayName("게시글 리스트 조회 (null)")
     void find() throws Exception {
-        this.mockMvc.perform(get("/articles")
+        this.mockMvc.perform(get("/articleDtos")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
             .andDo(document("index",
                 responseFields(
-                    subsectionWithPath("[]").description("List of articles")
+                    subsectionWithPath("[]").description("List of articleDtos")
                 )
             )
         );
@@ -176,7 +176,7 @@ public class ControllerTest {
         }
         given(articleService.getArticleList()).willReturn(dtoList);
 
-        this.mockMvc.perform(get("/articles")
+        this.mockMvc.perform(get("/articleDtos")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$[0].id").value(0L))
@@ -190,7 +190,7 @@ public class ControllerTest {
             .andExpect(jsonPath("$[2].content").value("content2"))
             .andDo(print())
             .andExpect(status().isOk())
-            .andDo(document("/articles",
+            .andDo(document("/articleDtos",
                 responseFields(
                     subsectionWithPath("[].id").description("Id of the one article"),
                     subsectionWithPath("[].title").description("title of the one article"),
@@ -210,7 +210,7 @@ public class ControllerTest {
     void read() throws Exception {
         given(articleService.read(1L)).willReturn(articleDto);
 
-        this.mockMvc.perform(get("/articles/1")
+        this.mockMvc.perform(get("/articleDtos/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
@@ -245,13 +245,13 @@ public class ControllerTest {
     void like() throws Exception {
         willDoNothing().given(articleService).addLike(1L);
 
-        this.mockMvc.perform(put("/articles/1/like")
+        this.mockMvc.perform(put("/articleDtos/1/like")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().string("Likes!"))
-            .andDo(document("/articles/{id}/like"));
+            .andDo(document("/articleDtos/{id}/like"));
     }
 
     @Test
@@ -259,13 +259,13 @@ public class ControllerTest {
     void hate() throws Exception {
         willDoNothing().given(articleService).cancelLike(1L);
 
-        this.mockMvc.perform(put("/articles/{id}/cancel-like")
+        this.mockMvc.perform(put("/articleDtos/{id}/cancel-like")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().string("Likes cancel"))
-            .andDo(document("/articles/{id}/cancel-like"));
+            .andDo(document("/articleDtos/{id}/cancel-like"));
     }
 
     @Test
