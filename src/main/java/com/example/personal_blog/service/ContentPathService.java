@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,8 @@ public class ContentPathService {
 
     private final String packagePath = "src/main/resources/static/images";
 
-    public String saveImages(MultipartFile imageFile, ArticleDto articleDto) throws IOException {
-        String fileName = LocalDateTime.now().toString().replaceAll(":", "-") + "_" + imageFile.getOriginalFilename();
+    public String saveImages(MultipartFile[] files, ArticleDto articleDto) throws IOException {
+        String fileName = LocalDateTime.now().toString().replaceAll(":", "-") + "_image";
 
         var article = articleDto.to(articleDto);
 
@@ -34,13 +35,16 @@ public class ContentPathService {
             if (!Files.exists(uploadPath)) {
                 Files.createDirectories(uploadPath);
             }
-            Files.copy(imageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            contentPathRepository.save(ContentPath.builder()
-                .contentPath(fileName)
-                .createdAt(LocalDateTime.now())
-                .article(article)
-                .build());
-            System.out.println("File saved successfully: " + filePath.toString());
+
+            for (MultipartFile file : files) {
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                contentPathRepository.save(ContentPath.builder()
+                    .contentPath(fileName)
+                    .createdAt(LocalDateTime.now())
+                    .article(article)
+                    .build());
+            }
+
         } catch (IOException e) {
             System.err.println("Error saving file: " + e.getMessage());
             throw e;
@@ -49,8 +53,51 @@ public class ContentPathService {
         return fileName;
     }
 
+
+    /**
+     * 업데이트 방식은 기존 이미지를 삭제하고 새로운 이미지를 추가하는 방식으로 진행
+     * @param files
+     * @param articleDto
+     * @throws IOException
+     */
+    public void updateImages(MultipartFile[] files, ArticleDto articleDto) throws IOException {
+        var article = articleDto.to(articleDto);
+        deleteAll(article.getArticleId());
+        saveImages(files, articleDto);
+    }
+
+    /**
+     * 이미지 삭제
+     * @param articleId
+     */
+    private void deleteAll(Long articleId) {
+        Set<ContentPath> contentPaths = contentPathRepository.findByArticleId(articleId);
+
+        //디렉토리에 저장된 이미지 삭제
+        if (!contentPaths.isEmpty() || contentPaths != null) {
+            for (ContentPath contentPath : contentPaths) {
+                try {
+                    if (Files.exists(Path.of(packagePath, contentPath.getContentPath()))) {
+                        Files.delete(Path.of(packagePath, contentPath.getContentPath()));
+                    }
+                } catch (IOException e) {
+                    System.err.println("Error deleting file: " + e.getMessage());
+                }
+            }
+        } else {
+            System.err.println("No images to delete");
+        }
+
+        // DB에 저장된 이미지 삭제
+        contentPathRepository.deleteAllByArticleId(articleId);
+    }
+
     public Set<ContentPathDto> getImagePaths(Long articleId) {
         Set<ContentPath> contentPaths = contentPathRepository.findByArticleId(articleId);
+
+        if (contentPaths.isEmpty() || contentPaths == null) {
+            return new HashSet<>();
+        }
 
         return contentPaths.stream()
             .map(ContentPathDto::from)

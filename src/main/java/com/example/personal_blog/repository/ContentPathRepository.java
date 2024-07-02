@@ -12,4 +12,9 @@ public interface ContentPathRepository extends JpaRepository<ContentPath, Long> 
 
     @Query("SELECT c FROM content_path c WHERE c.article.articleId = :articleId")
     Set<ContentPath> findByArticleId(@Param("articleId") Long articleId);
+
+    @Query("DELETE FROM content_path c WHERE c.article.articleId = :articleId")
+    void deleteAllByArticleId(@Param("articleId") Long articleId);
+
+//    Optional<Object> findAllByArticleId(Long articleId);
 }
