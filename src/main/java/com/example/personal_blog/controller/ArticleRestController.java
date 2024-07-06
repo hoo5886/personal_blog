@@ -1,6 +1,6 @@
 package com.example.personal_blog.controller;
 
-import com.example.personal_blog.model.ArticleDto;
+import com.example.personal_blog.dto.ArticleDto;
 import com.example.personal_blog.service.ArticleService;
 import com.example.personal_blog.service.ContentPathService;
 import java.io.IOException;

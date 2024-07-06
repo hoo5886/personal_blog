@@ -1,4 +1,4 @@
-package com.example.personal_blog.model;
+package com.example.personal_blog.dto;
 
 import com.example.personal_blog.entity.Authority;
 import com.example.personal_blog.entity.User;
