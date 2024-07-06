@@ -17,8 +17,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.personal_blog.model.ArticleDto;
-import com.example.personal_blog.model.ContentPathDto;
+import com.example.personal_blog.dto.ArticleDto;
+import com.example.personal_blog.dto.ContentPathDto;
 import com.example.personal_blog.service.ArticleService;
 import com.example.personal_blog.service.ContentPathService;
 import com.fasterxml.jackson.databind.ObjectMapper;

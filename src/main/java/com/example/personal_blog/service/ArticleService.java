@@ -2,9 +2,9 @@ package com.example.personal_blog.service;
 
 import com.example.personal_blog.entity.Article;
 import com.example.personal_blog.entity.ContentPath;
-import com.example.personal_blog.model.ContentPathDto;
+import com.example.personal_blog.dto.ContentPathDto;
 import com.example.personal_blog.repository.ArticleRepository;
-import com.example.personal_blog.model.ArticleDto;
+import com.example.personal_blog.dto.ArticleDto;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
