@@ -40,7 +40,6 @@ public class ContentPathService {
                 Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
                 contentPathRepository.save(ContentPath.builder()
                     .contentPath(fileName)
-                    .createdAt(LocalDateTime.now())
                     .article(article)
                     .build());
             }

@@ -22,7 +22,6 @@ public record ContentPathDto(
                 .contentPathId(contentPath.getContentPathId())
                 .articleDto(ArticleDto.from(contentPath.getArticle()))
                 .path(contentPath.getContentPath())
-                .createdAt(contentPath.getCreatedAt())
                 .build();
 
         }
@@ -31,7 +30,6 @@ public record ContentPathDto(
             return ContentPath.builder()
                     .contentPathId(dto.contentPathId())
                     .contentPath(dto.path())
-                    .createdAt(dto.createdAt())
                     .build();
         }
 }

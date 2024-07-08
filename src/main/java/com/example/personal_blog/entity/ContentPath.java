@@ -36,7 +36,4 @@ public class ContentPath {
     @Column(name = "content_path")
     private String contentPath;
 
-    @CreatedDate
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 }

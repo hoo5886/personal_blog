@@ -7,7 +7,6 @@ import com.example.personal_blog.repository.ArticleRepository;
 import com.example.personal_blog.dto.ArticleDto;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -39,13 +38,13 @@ public class ArticleService {
 
     /**
      * 게시글 조회
-     *
+     *   댓글포함
      * @param articleId
      * @return ArticleDto
      * @throws IOException
      */
-    public ArticleDto read(Long articleId) throws IOException {
-        var article = articleRepository.findById(articleId)
+    public ArticleDto readArticle(Long articleId) throws IOException {
+        var article = articleRepository.findByIdWithComments(articleId)
             .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
 
         //조회수
@@ -62,6 +61,19 @@ public class ArticleService {
     }
 
     /**
+     * 게시글 조회(읽기 전용)
+     *   댓글 미포함 (조회수 증가 없음)
+     * @param articleId
+     * @return
+     */
+    public ArticleDto readOnlyArticle(Long articleId) {
+        var article = articleRepository.findById(articleId)
+            .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
+
+        return ArticleDto.from(article);
+    }
+
+    /**
      * 게시글 수정
      * @param dto
      * @param id
@@ -73,7 +85,6 @@ public class ArticleService {
 
         article.setTitle(dto.title());
         article.setContent(dto.content());
-        article.setUpdatedAt(LocalDateTime.now());
         articleRepository.save(article);
 
         return "수정된 글: " + dto.articleId();

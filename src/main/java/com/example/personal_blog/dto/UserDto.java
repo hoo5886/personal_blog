@@ -14,13 +14,21 @@ public record UserDto(
     String username,
     String password,
     boolean enabled,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
     List<ArticleDto> articleDtos,
     List<AuthorityDto> authorityDtos,
-    LocalDateTime createdAt) {
-
+    List<CommentDto> commentDtos
+) {
     public UserDto {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
+        if (articleDtos == null) {
+            articleDtos = List.of();
+        }
+        if (authorityDtos == null) {
+            authorityDtos = List.of();
+        }
+        if (commentDtos == null) {
+            commentDtos = List.of();
         }
     }
 
@@ -31,12 +39,17 @@ public record UserDto(
             .username(user.getUsername())
             .password(user.getPassword())
             .enabled(user.isEnabled())
+            .createdAt(user.getCreatedAt())
+            .updatedAt(user.getUpdatedAt())
+            .articleDtos(user.getArticles().stream()
+                .map(ArticleDto::from)
+                .toList())
             .authorityDtos(user.getAuthorities().stream()
                 .map(authority -> (Authority) authority)
                 .map(AuthorityDto::from)
                 .collect(Collectors.toList()))
-            .articleDtos(user.getArticles().stream()
-                .map(ArticleDto::from)
+            .commentDtos(user.getComments().stream()
+                .map(CommentDto::from)
                 .toList())
             .build();
     }
@@ -50,6 +63,12 @@ public record UserDto(
                 .enabled(dto.enabled())
                 .articles(dto.articleDtos().stream()
                     .map(ArticleDto::to)
+                    .collect(Collectors.toList()))
+                .authorities(dto.authorityDtos().stream()
+                    .map(AuthorityDto::to)
+                    .collect(Collectors.toList()))
+                .comments(dto.commentDtos().stream()
+                    .map(CommentDto::to)
                     .collect(Collectors.toList()))
                 .build();
     }
