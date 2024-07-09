@@ -2,6 +2,7 @@ package com.example.personal_blog.dto;
 
 import com.example.personal_blog.entity.Authority;
 import com.example.personal_blog.entity.Role;
+import com.example.personal_blog.entity.User;
 import lombok.Builder;
 
 @Builder
@@ -19,11 +20,11 @@ public record AuthorityDto(
             .build();
     }
 
-    public static Authority to(AuthorityDto authorityDto) {
+    public static Authority to(AuthorityDto authorityDto, User user) {
         return Authority.builder()
                 .authorityId(authorityDto.authorityId())
                 .role(authorityDto.role())
-                .user(UserDto.to(authorityDto.userDto()))
+                .user(user)
                 .build();
     }
 }

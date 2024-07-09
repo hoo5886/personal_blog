@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS article (
                         likes INT DEFAULT 0,
                         user_id BIGINT NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                             CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user(user_id)
 
 );
@@ -25,7 +25,8 @@ CREATE TABLE IF NOT EXISTS user (
                          username VARCHAR(255) NOT NULL,
                          password VARCHAR(255) NOT NULL,
                          enabled BOOLEAN DEFAULT TRUE,
-                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS authority (
@@ -33,4 +34,14 @@ CREATE TABLE IF NOT EXISTS authority (
                         role VARCHAR(255) NOT NULL,
                         user_id BIGINT NOT NULL,
                         CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user(user_id)
+);
+
+CREATE TABLE IF NOT EXISTS comment (
+                         comment_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                         nickname VARCHAR(255) NOT NULL,
+                         comment MEDIUMTEXT NOT NULL,
+                         article_id BIGINT NOT NULL,
+                         user_id BIGINT NOT NULL,
+                         CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user(user_id),
+                         CONSTRAINT fk_article FOREIGN KEY (article_id) REFERENCES article(article_id)
 );

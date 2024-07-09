@@ -30,7 +30,7 @@ public class ArticleRestController {
     }
 
     /**
-     * 게시글 작성
+     * 게시글 저장
      * @param dto
      */
     @PostMapping("/write")
@@ -63,7 +63,7 @@ public class ArticleRestController {
      */
     @GetMapping("/articles/{articleId}")
     public ResponseEntity<ArticleDto> getArticleById(@PathVariable Long articleId) throws IOException {
-        var articleDto = articleService.read(articleId);
+        var articleDto = articleService.readArticle(articleId);
 
         return new ResponseEntity<>(articleDto, HttpStatus.OK);
     }
@@ -80,7 +80,7 @@ public class ArticleRestController {
     public ResponseEntity<String> updateArticle(@RequestPart("article") ArticleDto dto,
                                                 @PathVariable Long articleId,
                                                 @RequestPart(value = "files", required = false) MultipartFile[] files) throws IOException{
-        var savedDto = articleService.read(articleId);
+        var savedDto = articleService.readArticle(articleId);
 //        var contentPaths = savedDto.contentPaths();
 
         String response = articleService.update(dto, articleId);

@@ -4,25 +4,17 @@ import com.example.personal_blog.entity.ContentPath;
 import java.time.LocalDateTime;
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record ContentPathDto(
     Long contentPathId,
-    ArticleDto articleDto,
     String path,
-    LocalDateTime createdAt
+    Long articleId
 ) {
-        public ContentPathDto {
-            if (createdAt == null) {
-                createdAt = LocalDateTime.now();
-            }
-        }
-
         public static ContentPathDto from(ContentPath contentPath) {
             return ContentPathDto.builder()
                 .contentPathId(contentPath.getContentPathId())
-                .articleDto(ArticleDto.from(contentPath.getArticle()))
                 .path(contentPath.getContentPath())
-                .createdAt(contentPath.getCreatedAt())
+                .articleId(contentPath.getArticle().getArticleId())
                 .build();
 
         }
@@ -31,7 +23,6 @@ public record ContentPathDto(
             return ContentPath.builder()
                     .contentPathId(dto.contentPathId())
                     .contentPath(dto.path())
-                    .createdAt(dto.createdAt())
                     .build();
         }
 }

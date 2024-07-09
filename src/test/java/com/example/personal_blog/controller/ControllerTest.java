@@ -8,6 +8,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.put;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -18,9 +19,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.personal_blog.dto.ArticleDto;
+import com.example.personal_blog.dto.CommentDto;
 import com.example.personal_blog.dto.ContentPathDto;
+import com.example.personal_blog.dto.UserDto;
+import com.example.personal_blog.entity.User;
 import com.example.personal_blog.service.ArticleService;
 import com.example.personal_blog.service.ContentPathService;
+import com.example.personal_blog.service.JpaUserDetailsService;
+import com.example.personal_blog.service.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
@@ -29,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,7 +71,19 @@ public class ControllerTest {
     @MockBean
     private ContentPathService contentPathService;
 
+    @MockBean
+    private JpaUserDetailsService jpaUserDetailsService;
+
+    @MockBean
+        private JwtService jwtService;
+
     ArticleDto articleDto;
+
+    CommentDto commentDto;
+
+    UserDto userDto;
+
+    LocalDateTime now = LocalDateTime.now();
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
@@ -74,13 +93,13 @@ public class ControllerTest {
 
         var contentPathDto1 = ContentPathDto.builder()
             .contentPathId(1L)
-            .articleDto(articleDto)
+            .articleId(1L)
             .path("/resources/testImages/image1.png")
             .build();
 
         var contentPathDto2 =ContentPathDto.builder()
             .contentPathId(2L)
-            .articleDto(articleDto)
+            .articleId(1L)
             .path("/resources/testImages/image2.png")
             .build();
 
@@ -88,18 +107,44 @@ public class ControllerTest {
         contentPaths.add(contentPathDto1);
         contentPaths.add(contentPathDto2);
 
+        commentDto = CommentDto.builder()
+            .commentId(1L)
+            .userId(1L)
+            .articleId(1L)
+            .nickname("nickname")
+            .comment("comment")
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
+
         articleDto = ArticleDto.builder()
             .articleId(1L)
             .title("title")
             .content("content")
             .hits(0)
             .likes(0)
+            .userId(1L)
+            .loginId("loginId")
+            .username("username")
+            .commentDtos(List.of(commentDto))
             .contentPaths(contentPaths)
             .isDeleted(false)
-            .createdAt(LocalDateTime.now())
+            .createdAt(now)
+            .updatedAt(now)
             .build();
 
-
+        userDto = UserDto.builder()
+            .userId(1L)
+            .loginId("loginId")
+            .username("username")
+            .password("password")
+            .enabled(true)
+            .articleDtos(List.of(articleDto))
+            .authorityDtos(List.of())
+            .commentDtos(List.of(commentDto))
+            .createdAt(now)
+            .updatedAt(now)
+            .build();
     }
 
     @Test
@@ -118,23 +163,36 @@ public class ControllerTest {
     void write() throws Exception {
         String dtoJson = mapper.writeValueAsString(articleDto);
 
-        this.mockMvc.perform(post("/write")
+        MockMultipartFile jsonFile = new MockMultipartFile("article", "", "application/json", dtoJson.getBytes());
+        MockMultipartFile imageFile = new MockMultipartFile("files", "image.jpg", "image/jpeg", "image content".getBytes());
+
+
+        this.mockMvc.perform(multipart("/write")
+                .file(jsonFile)
+                .file(imageFile)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(dtoJson))
             .andDo(print())
             .andExpect(status().isCreated())
-            .andExpect(content().json(dtoJson))
+            .andExpect(jsonPath("$.articleId").value(1L))
+            .andExpect(jsonPath("$.title").value("title"))
+            .andExpect(jsonPath("$.content").value("content"))
             .andDo(document("write",
                 responseFields(
-                    subsectionWithPath("id").description("Article ID"),
-                    subsectionWithPath("title").description("Article Title"),
-                    subsectionWithPath("content").description("Article Content"),
-                    subsectionWithPath("hits").description("Article Hits"),
-                    subsectionWithPath("likes").description("Article Likes"),
-                    subsectionWithPath("isDeleted").description("Article isDeleted"),
-                    subsectionWithPath("createdAt").description("Article Created At"),
-                    subsectionWithPath("updatedAt").description("Article Updated At")
+                    fieldWithPath("articleId").description("Article ID"),
+                    fieldWithPath("title").description("Article Title"),
+                    fieldWithPath("content").description("Article Content"),
+                    fieldWithPath("hits").description("Article Hits"),
+                    fieldWithPath("likes").description("Article Likes"),
+                    fieldWithPath("isDeleted").description("Article isDeleted"),
+                    fieldWithPath("createdAt").description("Article Created At"),
+                    fieldWithPath("updatedAt").description("Article Updated At"),
+                    fieldWithPath("userId").description("User ID"),
+                    fieldWithPath("loginId").description("User Login ID"),
+                    fieldWithPath("username").description("User Name"),
+                    subsectionWithPath("contentPaths").ignored(),
+                    subsectionWithPath("commentDtos").ignored()
                 )
             )
         );
@@ -161,7 +219,7 @@ public class ControllerTest {
     void findList() throws Exception {
 
         List<ArticleDto> dtoList = new ArrayList<>();
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 2; i++) {
             ArticleDto dto = ArticleDto.builder()
                 .articleId((long) i)
                 .title("title" + i)
@@ -169,7 +227,8 @@ public class ControllerTest {
                 .hits(0)
                 .likes(0)
                 .isDeleted(false)
-                .createdAt(LocalDateTime.now())
+                .createdAt(now)
+                .updatedAt(now)
                 .build();
 
             dtoList.add(dto);
@@ -179,27 +238,39 @@ public class ControllerTest {
         this.mockMvc.perform(get("/articles")
             .contentType(MediaType.APPLICATION_JSON)
             .accept(MediaType.APPLICATION_JSON))
-            .andExpect(jsonPath("$[0].id").value(0L))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].articleId").value(0L))
             .andExpect(jsonPath("$[0].title").value("title0"))
             .andExpect(jsonPath("$[0].content").value("content0"))
-            .andExpect(jsonPath("$[1].id").value(1L))
+            .andExpect(jsonPath("$[0].hits").value(0))
+            .andExpect(jsonPath("$[0].likes").value(0))
+            .andExpect(jsonPath("$[0].isDeleted").value(false))
+            .andExpect(jsonPath("$[0].createdAt").exists())
+            .andExpect(jsonPath("$[0].updatedAt").exists())
+            .andExpect(jsonPath("$[1].articleId").value(1L))
             .andExpect(jsonPath("$[1].title").value("title1"))
             .andExpect(jsonPath("$[1].content").value("content1"))
-            .andExpect(jsonPath("$[2].id").value(2L))
-            .andExpect(jsonPath("$[2].title").value("title2"))
-            .andExpect(jsonPath("$[2].content").value("content2"))
+            .andExpect(jsonPath("$[1].hits").value(0))
+            .andExpect(jsonPath("$[1].likes").value(0))
+            .andExpect(jsonPath("$[1].isDeleted").value(false))
+            .andExpect(jsonPath("$[1].createdAt").exists())
+            .andExpect(jsonPath("$[1].updatedAt").exists())
             .andDo(print())
-            .andExpect(status().isOk())
-            .andDo(document("/articles",
+            .andDo(document("articles",
                 responseFields(
-                    subsectionWithPath("[].id").description("Id of the one article"),
-                    subsectionWithPath("[].title").description("title of the one article"),
-                    subsectionWithPath("[].content").description("content of the one article"),
-                    subsectionWithPath("[].hits").description("hits of the one article"),
-                    subsectionWithPath("[].likes").description("likes of the one article"),
-                    subsectionWithPath("[].isDeleted").description("deleted of the one article"),
-                    subsectionWithPath("[].createdAt").description("createdAt of the one article"),
-                    subsectionWithPath("[].updatedAt").description("updatedAt of the one article")
+                    fieldWithPath("[].articleId").description("Article ID"),
+                    fieldWithPath("[].title").description("Article Title"),
+                    fieldWithPath("[].content").description("Article Content"),
+                    fieldWithPath("[].hits").description("Article Hits"),
+                    fieldWithPath("[].likes").description("Article Likes"),
+                    fieldWithPath("[].isDeleted").description("Article isDeleted"),
+                    fieldWithPath("[].createdAt").description("Article Created At"),
+                    fieldWithPath("[].updatedAt").description("Article Updated At"),
+                    fieldWithPath("[].userId").ignored(),
+                    fieldWithPath("[].loginId").ignored(),
+                    fieldWithPath("[].username").ignored(),
+                    fieldWithPath("[].contentPaths").ignored(),
+                    fieldWithPath("[].commentDtos").ignored()
                 )
             )
         );
@@ -208,7 +279,7 @@ public class ControllerTest {
     @Test
     @DisplayName("게시글 조회")
     void read() throws Exception {
-        given(articleService.read(1L)).willReturn(articleDto);
+        given(articleService.readArticle(1L)).willReturn(articleDto);
 
         this.mockMvc.perform(get("/articles/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -218,26 +289,55 @@ public class ControllerTest {
             .andExpect(jsonPath("$.articleId").value(1L))
             .andExpect(jsonPath("$.title").value("title"))
             .andExpect(jsonPath("$.content").value("content"))
+            .andExpect(jsonPath("$.hits").value(0))
+            .andExpect(jsonPath("$.likes").value(0))
+            .andExpect(jsonPath("$.isDeleted").value(false))
+            .andExpect(jsonPath("$.createdAt").exists())
+            .andExpect(jsonPath("$.updatedAt").exists())
+            .andExpect(jsonPath("$.userId").value(1L))
+            .andExpect(jsonPath("$.loginId").value("loginId"))
+            .andExpect(jsonPath("$.username").value("username"))
+            .andExpect(jsonPath("$.commentDtos[0].commentId").value(1L))
+            .andExpect(jsonPath("$.commentDtos[0].nickname").value("nickname"))
+            .andExpect(jsonPath("$.commentDtos[0].comment").value("comment"))
+            .andExpect(jsonPath("$.commentDtos[0].userId").value(1L))
+            .andExpect(jsonPath("$.commentDtos[0].articleId").value(1L))
             .andExpect(jsonPath("$.contentPaths[0].contentPathId").value(1L))
             .andExpect(jsonPath("$.contentPaths[0].path").value("/resources/testImages/image1.png"))
+            .andExpect(jsonPath("$.contentPaths[0].articleId").value(1L))
             .andExpect(jsonPath("$.contentPaths[1].contentPathId").value(2L))
             .andExpect(jsonPath("$.contentPaths[1].path").value("/resources/testImages/image2.png"))
+            .andExpect(jsonPath("$.contentPaths[1].articleId").value(1L))
             .andDo(print())
-            .andDo(document("/article",
+            .andDo(document("/articles/{articleId}",
                 responseFields(
-                    subsectionWithPath("articleId").description("Id of the article"),
-                    subsectionWithPath("title").description("Title of the article"),
-                    subsectionWithPath("content").description("Content of the article"),
-                    subsectionWithPath("contentPaths").description("List of content paths"),
-                    subsectionWithPath("contentPaths[].contentPathId").description("Id of the content path"),
-                    subsectionWithPath("contentPaths[].path").description("Path of the content"),
-                    subsectionWithPath("hits").description("Hits of the article"),
-                    subsectionWithPath("likes").description("Likes of the article"),
-                    subsectionWithPath("isDeleted").description("Deleted status of the article"),
-                    subsectionWithPath("createdAt").description("Creation time of the article"),
-                    subsectionWithPath("updatedAt").description("Update time of the article")
+                    fieldWithPath("articleId").description("Article ID"),
+                    fieldWithPath("title").description("Article Title"),
+                    fieldWithPath("content").description("Article Content"),
+                    fieldWithPath("hits").description("Article Hits"),
+                    fieldWithPath("likes").description("Article Likes"),
+                    fieldWithPath("isDeleted").description("Article isDeleted"),
+                    fieldWithPath("createdAt").description("Article Created At"),
+                    fieldWithPath("updatedAt").description("Article Updated At"),
+                    fieldWithPath("userId").description("유저 아이디"),
+                    fieldWithPath("loginId").description("로그인 아이디"),
+                    fieldWithPath("username").description("유저 이름"),
+                    fieldWithPath("commentDtos[0].commentId").description("댓글 아이디"),
+                    fieldWithPath("commentDtos[0].nickname").description("댓글 작성자"),
+                    fieldWithPath("commentDtos[0].comment").description("댓글 내용"),
+                    fieldWithPath("commentDtos[0].userId").description("댓글 작성자 아이디"),
+                    fieldWithPath("commentDtos[0].articleId").description("댓글이 달린 게시글 아이디"),
+                    fieldWithPath("commentDtos[0].createdAt").description("댓글 생성일"),
+                    fieldWithPath("commentDtos[0].updatedAt").description("댓글 수정일"),
+                    fieldWithPath("contentPaths[0].contentPathId").description("이미지 아이디"),
+                    fieldWithPath("contentPaths[0].path").description("이미지 경로"),
+                    fieldWithPath("contentPaths[0].articleId").description("게시글 아이디"),
+                    fieldWithPath("contentPaths[1].contentPathId").description("이미지 아이디"),
+                    fieldWithPath("contentPaths[1].path").description("이미지 경로"),
+                    fieldWithPath("contentPaths[1].articleId").description("게시글 아이디")
                 )
-            ));
+            )
+        );
     }
 
     @Test
@@ -259,12 +359,12 @@ public class ControllerTest {
     void hate() throws Exception {
         willDoNothing().given(articleService).cancelLike(1L);
 
-        this.mockMvc.perform(put("/articles/{id}/cancel-like")
+        this.mockMvc.perform(put("/articles/1/cancel-like")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(content().string("Likes cancel"))
+            .andExpect(content().string("Likes canceled"))
             .andDo(document("/articles/{id}/cancel-like"));
     }
 
@@ -277,7 +377,7 @@ public class ControllerTest {
         final String contentPath = "src/test/resources/testImages/" + fileName + fileExtension;
         FileInputStream fis = new FileInputStream(contentPath);
 
-        when(articleService.read(any(Long.class))).thenReturn(articleDto);
+        when(articleService.readArticle(any(Long.class))).thenReturn(articleDto);
         when(articleService.update(any(ArticleDto.class), any(Long.class))).thenReturn("Updated");
 
         MockMultipartFile file = new MockMultipartFile("files", fileName + fileExtension, "image/png", fis);
