@@ -30,7 +30,7 @@ public class ArticleRestController {
     }
 
     /**
-     * 게시글 작성
+     * 게시글 저장
      * @param dto
      */
     @PostMapping("/write")

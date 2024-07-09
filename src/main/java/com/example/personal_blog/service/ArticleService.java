@@ -5,6 +5,9 @@ import com.example.personal_blog.entity.ContentPath;
 import com.example.personal_blog.dto.ContentPathDto;
 import com.example.personal_blog.repository.ArticleRepository;
 import com.example.personal_blog.dto.ArticleDto;
+import com.example.personal_blog.repository.CommentRepository;
+import com.example.personal_blog.repository.ContentPathRepository;
+import com.example.personal_blog.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,8 +22,10 @@ import org.springframework.stereotype.Service;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
-
     private final ContentPathService contentPathService;
+    private final ContentPathRepository contentPathRepository;
+    private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * 게시글 목록 조회
@@ -128,7 +133,7 @@ public class ArticleService {
      * @return
      */
     public ArticleDto write(ArticleDto articleDto) {
-        var article = ArticleDto.to(articleDto);
+        var article = getUserByArticle(articleDto);
         articleRepository.save(article);
 
         Set<ContentPathDto> contentPathDtos = articleDto.contentPaths() != null ? articleDto.contentPaths() : new HashSet<>();
@@ -140,5 +145,18 @@ public class ArticleService {
         }
 
         return ArticleDto.from(article);
+    }
+
+    public Article getUserByArticle(ArticleDto articleDto) {
+
+        //글을 작성한 유저, 글에 포함된 댓글들, 글이 가지고 있는 이미지 경로
+        var user = userRepository.findById(articleDto.userId())
+            .orElseThrow(() -> new EntityNotFoundException("사용자가 존재하지 않습니다."));
+
+        var comments = commentRepository.findAllByArticleId(articleDto.articleId()).get();
+
+        var contentPaths = contentPathRepository.findByArticleId(articleDto.articleId());
+
+        return ArticleDto.to(articleDto, user, comments, contentPaths);
     }
 }

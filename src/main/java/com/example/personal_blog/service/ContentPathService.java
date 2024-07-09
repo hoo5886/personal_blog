@@ -22,12 +22,14 @@ public class ContentPathService {
 
     private final ContentPathRepository contentPathRepository;
 
+    private final ArticleService articleService;
+
     private final String packagePath = "src/main/resources/static/images";
 
     public String saveImages(MultipartFile[] files, ArticleDto articleDto) throws IOException {
         String fileName = LocalDateTime.now().toString().replaceAll(":", "-") + "_image";
 
-        var article = articleDto.to(articleDto);
+        var article = articleService.getUserByArticle(articleDto);
 
         Path uploadPath = Path.of(packagePath);
         Path filePath = uploadPath.resolve(fileName);
@@ -60,7 +62,7 @@ public class ContentPathService {
      * @throws IOException
      */
     public void updateImages(MultipartFile[] files, ArticleDto articleDto) throws IOException {
-        var article = articleDto.to(articleDto);
+        var article = articleService.getUserByArticle(articleDto);
         deleteAll(article.getArticleId());
         saveImages(files, articleDto);
     }

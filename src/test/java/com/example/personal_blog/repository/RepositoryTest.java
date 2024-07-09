@@ -36,8 +36,6 @@ public class RepositoryTest {
             .likes(0)
             .isDeleted(false)
             .contentPaths(Set.of())
-            .createdAt(LocalDateTime.now())
-            .updatedAt(LocalDateTime.now())
             .build();
     }
 
@@ -149,7 +147,6 @@ public class RepositoryTest {
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
         article2.setTitle("수정된 제목");
         article2.setContent("수정된 내용");
-        article2.setUpdatedAt(updatedAt);
         articleRepository.save(article2);
 
         //then

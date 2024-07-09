@@ -1,8 +1,10 @@
 package com.example.personal_blog.service;
 
 import com.example.personal_blog.dto.CommentDto;
+import com.example.personal_blog.entity.Comment;
 import com.example.personal_blog.repository.ArticleRepository;
 import com.example.personal_blog.repository.CommentRepository;
+import com.example.personal_blog.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final ArticleRepository articleRepository;
+    private final UserRepository userRepository;
 
     public List<CommentDto> getCommentsByUser(Long userId) {
         var comments = commentRepository.findAllByUserId(userId);
@@ -35,7 +38,10 @@ public class CommentService {
         var article = articleRepository.findById(articleId)
             .orElseThrow(() -> new EntityNotFoundException("게시글이 존재하지 않습니다."));
 
-        var comment = CommentDto.to(commentDto);
+        var user = userRepository.findById(commentDto.userId())
+            .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 유저입니다."));
+
+        var comment = CommentDto.to(commentDto, article, user);
         comment.setArticle(article);
         commentRepository.save(comment);
 
