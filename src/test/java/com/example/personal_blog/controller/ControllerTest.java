@@ -22,7 +22,6 @@ import com.example.personal_blog.dto.ArticleDto;
 import com.example.personal_blog.dto.CommentDto;
 import com.example.personal_blog.dto.ContentPathDto;
 import com.example.personal_blog.dto.UserDto;
-import com.example.personal_blog.entity.User;
 import com.example.personal_blog.service.ArticleService;
 import com.example.personal_blog.service.ContentPathService;
 import com.example.personal_blog.service.JpaUserDetailsService;
@@ -35,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +54,7 @@ import org.springframework.web.context.WebApplicationContext;
 * consider using @WebMvcTest instead.
 * */
 @ExtendWith(RestDocumentationExtension.class)
-@WebMvcTest(controllers = ArticleRestController.class)
+@WebMvcTest(controllers = ArticleController.class)
 public class ControllerTest {
 
     @Autowired

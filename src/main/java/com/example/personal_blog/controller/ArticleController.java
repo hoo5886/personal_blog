@@ -19,10 +19,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
-public class ArticleRestController {
+public class ArticleController {
 
     private final ArticleService articleService;
-    private final ContentPathService contentPathService;
 
     @GetMapping("/hello")
     public String home() {
@@ -39,13 +38,7 @@ public class ArticleRestController {
         @RequestPart("article") ArticleDto dto,
         @RequestPart(value = "files", required = false) MultipartFile[] files) throws IOException {
 
-        ArticleDto savedDto = articleService.write(dto);
-
-        if (files != null) {
-            contentPathService.saveImages(files, savedDto);
-        }
-
-        return new ResponseEntity<>(dto, HttpStatus.CREATED);
+        return new ResponseEntity<>(articleService.write(dto, files), HttpStatus.CREATED);
     }
 
     /**
@@ -74,19 +67,13 @@ public class ArticleRestController {
      * ArticleDto에 담겨있는 정보에 더해 이미지 정보까지 업데이트한다.
      * 이미지 업데이트는 해당 글이 가지고 있는 이미지를 일괄 삭제 후, 다시 저장하는 방식으로 한다.
      * @param articleId
-     * @param dto
+     * @param articleDto
      */
     @PostMapping("/articles/{articleId}/update")
-    public ResponseEntity<String> updateArticle(@RequestPart("article") ArticleDto dto,
+    public ResponseEntity<String> updateArticle(@RequestPart("article") ArticleDto articleDto,
                                                 @PathVariable Long articleId,
                                                 @RequestPart(value = "files", required = false) MultipartFile[] files) throws IOException{
-        var savedDto = articleService.readArticle(articleId);
-//        var contentPaths = savedDto.contentPaths();
-
-        String response = articleService.update(dto, articleId);
-        if (files != null) {
-            contentPathService.updateImages(files, savedDto);
-        }
+        String response = articleService.update(articleId, files);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

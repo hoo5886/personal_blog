@@ -9,7 +9,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 @MappedSuperclass
 @Getter
-public abstract class BaseEntity {
+public abstract sealed class BaseEntity permits Article, Comment, User, Authority {
 
     @CreatedDate
     @Column(name = "created_at", updatable = false)
