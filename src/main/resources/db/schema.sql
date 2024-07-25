@@ -45,3 +45,12 @@ CREATE TABLE IF NOT EXISTS comment (
                          CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user(user_id),
                          CONSTRAINT fk_article FOREIGN KEY (article_id) REFERENCES article(article_id)
 );
+
+CREATE TABLE IF NOT EXISTS notification (
+                         notification_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                         message VARCHAR(255) NOT NULL,
+                         user_id BIGINT NOT NULL,
+                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                         CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES user(user_id)
+);

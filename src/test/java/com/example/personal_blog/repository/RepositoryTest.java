@@ -59,8 +59,8 @@ public class RepositoryTest {
         contentPathRepository.save(contentPath2);
 
         // then
-        Set<ContentPath> contentPaths = contentPathRepository.findByArticleId(
-            article.getArticleId());
+        var contentPaths = contentPathRepository.findByArticleId(
+            article.getArticleId()).get();
         var articles = articleRepository.findById(1L)
             .orElseThrow(() -> new IllegalArgumentException("게시글이 없습니다."));
 
@@ -108,8 +108,8 @@ public class RepositoryTest {
         contentPathRepository.save(contentPath2);
 
         // then
-        Set<ContentPath> contentPaths = contentPathRepository.findByArticleId(
-            article.getArticleId());
+        var contentPaths = contentPathRepository.findByArticleId(
+            article.getArticleId()).get();
 
         assertThat(contentPaths.size()).isEqualTo(2);
         assertThat(contentPaths).extracting("contentPath")

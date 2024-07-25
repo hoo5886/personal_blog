@@ -3,6 +3,7 @@ package com.example.personal_blog.service;
 import com.example.personal_blog.entity.Article;
 import com.example.personal_blog.entity.ContentPath;
 import com.example.personal_blog.dto.ContentPathDto;
+import com.example.personal_blog.event.ArticleLikedEvent;
 import com.example.personal_blog.repository.ArticleRepository;
 import com.example.personal_blog.dto.ArticleDto;
 import com.example.personal_blog.repository.CommentRepository;
@@ -15,10 +16,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
@@ -26,6 +32,7 @@ public class ArticleService {
     private final ContentPathRepository contentPathRepository;
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * 게시글 목록 조회
@@ -67,7 +74,6 @@ public class ArticleService {
 
     /**
      * 게시글 조회(읽기 전용)
-     *   댓글 미포함 (조회수 증가 없음)
      * @param articleId
      * @return
      */
@@ -80,46 +86,56 @@ public class ArticleService {
 
     /**
      * 게시글 수정
-     * @param dto
-     * @param id
+     * @param articleId
      * @return
      */
-    public String update(ArticleDto dto, Long id) {
-        var article = articleRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
+    public String update(Long articleId, MultipartFile[] files) throws IOException {
+        var article = articleRepository.findById(articleId)
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. articleId: " + articleId));
 
-        article.setTitle(dto.title());
-        article.setContent(dto.content());
+        if (files != null) {
+            contentPathService.updateImages(files, article);
+        }
+
+        article.setTitle(article.getTitle());
+        article.setContent(article.getContent());
         articleRepository.save(article);
 
-        return "수정된 글: " + dto.articleId();
+        return "수정된 글: " + article.getArticleId();
     }
 
     /**
      * 게시글 삭제
-     * @param id
+     * @param articleId
      * @return
      */
-    public String delete(Long id) {
-        var article = articleRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
+    public String delete(Long articleId) {
+        var article = articleRepository.findById(articleId)
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. articleId: " + articleId));
 
         article.setDeleted(true);
         articleRepository.save(article);
 
-        return "게시글이 블라인드 처리됐습니다. :" + id;
+        return "게시글이 블라인드 처리됐습니다. :" + articleId;
     }
 
-    public void addLike(Long id) {
-        var article = articleRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
+    @Transactional
+    public void addLike(Long articleId) {
+        var article = articleRepository.findById(articleId)
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. articleId: " + articleId));
         article.setLikes(article.getLikes() + 1);
+
+        eventPublisher.publishEvent(new ArticleLikedEvent(article));
+
         articleRepository.save(article);
+
+        log.info("게시글 좋아요 이벤트를 발생시켰습니다.");
     }
 
-    public void cancelLike(Long id) {
-        var article = articleRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. id: " + id));
+    @Transactional
+    public void cancelLike(Long articleId) {
+        var article = articleRepository.findById(articleId)
+            .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. articleId: " + articleId));
 
         article.setLikes(article.getLikes() - 1);
 
@@ -132,16 +148,23 @@ public class ArticleService {
      * @param articleDto
      * @return
      */
-    public ArticleDto write(ArticleDto articleDto) {
+    @Transactional
+    public ArticleDto write(ArticleDto articleDto, MultipartFile[] files) throws IOException {
         var article = getUserByArticle(articleDto);
         articleRepository.save(article);
 
         Set<ContentPathDto> contentPathDtos = articleDto.contentPaths() != null ? articleDto.contentPaths() : new HashSet<>();
 
-        for (ContentPathDto contentPathDto : contentPathDtos) {
-            ContentPath contentPath = new ContentPath();
-            contentPath.setContentPath(contentPathDto.path());
-            article.addContentPath(contentPath); // Article에 ContentPath 추가
+        if (!contentPathDtos.isEmpty()) {
+            for (ContentPathDto contentPathDto : contentPathDtos) {
+                ContentPath contentPath = new ContentPath();
+                contentPath.setContentPath(contentPathDto.path());
+                article.addContentPath(contentPath); // Article에 ContentPath 추가
+            }
+        }
+
+        if (files != null) {
+            contentPathService.saveImages(files, article);
         }
 
         return ArticleDto.from(article);
@@ -155,7 +178,8 @@ public class ArticleService {
 
         var comments = commentRepository.findAllByArticleId(articleDto.articleId()).get();
 
-        var contentPaths = contentPathRepository.findByArticleId(articleDto.articleId());
+        var contentPaths = contentPathRepository.findByArticleId(articleDto.articleId())
+            .orElse(new HashSet<>());
 
         return ArticleDto.to(articleDto, user, comments, contentPaths);
     }

@@ -1,7 +1,7 @@
 package com.example.personal_blog.service;
 
+import com.example.personal_blog.entity.Article;
 import com.example.personal_blog.entity.ContentPath;
-import com.example.personal_blog.dto.ArticleDto;
 import com.example.personal_blog.dto.ContentPathDto;
 import com.example.personal_blog.repository.ContentPathRepository;
 import java.io.IOException;
@@ -22,14 +22,10 @@ public class ContentPathService {
 
     private final ContentPathRepository contentPathRepository;
 
-    private final ArticleService articleService;
-
     private final String packagePath = "src/main/resources/static/images";
 
-    public String saveImages(MultipartFile[] files, ArticleDto articleDto) throws IOException {
+    public String saveImages(MultipartFile[] files, Article article) throws IOException {
         String fileName = LocalDateTime.now().toString().replaceAll(":", "-") + "_image";
-
-        var article = articleService.getUserByArticle(articleDto);
 
         Path uploadPath = Path.of(packagePath);
         Path filePath = uploadPath.resolve(fileName);
@@ -38,14 +34,19 @@ public class ContentPathService {
                 Files.createDirectories(uploadPath);
             }
 
-            for (MultipartFile file : files) {
-                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-                contentPathRepository.save(ContentPath.builder()
-                    .contentPath(fileName)
-                    .article(article)
-                    .build());
+            if (files != null) {
+                for (MultipartFile file : files) {
+                    if (file.isEmpty()) {
+                        continue;
+                    }
+                    Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                    contentPathRepository.save(ContentPath.builder()
+                        .contentPath(fileName)
+                        .article(article)
+                        .build()
+                    );
+                }
             }
-
         } catch (IOException e) {
             System.err.println("Error saving file: " + e.getMessage());
             throw e;
@@ -54,29 +55,27 @@ public class ContentPathService {
         return fileName;
     }
 
-
     /**
      * 업데이트 방식은 기존 이미지를 삭제하고 새로운 이미지를 추가하는 방식으로 진행
      * @param files
-     * @param articleDto
+     * @param article
      * @throws IOException
      */
-    public void updateImages(MultipartFile[] files, ArticleDto articleDto) throws IOException {
-        var article = articleService.getUserByArticle(articleDto);
-        deleteAll(article.getArticleId());
-        saveImages(files, articleDto);
+    public void updateImages(MultipartFile[] files, Article article) throws IOException {
+        deleteAllContentPaths(article.getArticleId());
+        saveImages(files, article);
     }
 
     /**
      * 이미지 삭제
      * @param articleId
      */
-    private void deleteAll(Long articleId) {
-        Set<ContentPath> contentPaths = contentPathRepository.findByArticleId(articleId);
+    private void deleteAllContentPaths(Long articleId) {
+        var contentPaths = contentPathRepository.findByArticleId(articleId);
 
         //디렉토리에 저장된 이미지 삭제
-        if (!contentPaths.isEmpty() || contentPaths != null) {
-            for (ContentPath contentPath : contentPaths) {
+        if (contentPaths.isPresent() || !contentPaths.isEmpty()) {
+            for (ContentPath contentPath : contentPaths.get()) {
                 try {
                     if (Files.exists(Path.of(packagePath, contentPath.getContentPath()))) {
                         Files.delete(Path.of(packagePath, contentPath.getContentPath()));
@@ -94,13 +93,13 @@ public class ContentPathService {
     }
 
     public Set<ContentPathDto> getImagePaths(Long articleId) {
-        Set<ContentPath> contentPaths = contentPathRepository.findByArticleId(articleId);
+        var contentPaths = contentPathRepository.findByArticleId(articleId);
 
-        if (contentPaths.isEmpty() || contentPaths == null) {
+        if (contentPaths.isEmpty() || contentPaths.isPresent()) {
             return new HashSet<>();
         }
 
-        return contentPaths.stream()
+        return contentPaths.get().stream()
             .map(ContentPathDto::from)
             .collect(Collectors.toSet());
     }

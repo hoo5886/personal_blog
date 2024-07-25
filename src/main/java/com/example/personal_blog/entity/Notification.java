@@ -2,19 +2,18 @@ package com.example.personal_blog.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -22,22 +21,24 @@ import org.springframework.security.core.GrantedAuthority;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public final class Authority extends BaseEntity implements GrantedAuthority {
+@ToString
+public class Notification {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long authorityId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role")
-    private Role role;
+    @Column(name = "notification_id")
+    private Long notificationId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user; // 알림을 받을 유저
 
-    @Override
-    public String getAuthority() {
-        return this.role.name();
-    }
+    @Column(name = "message")
+    private String message;
+
+    @Column(name = "created_time")
+    private LocalDateTime createdTime;
+
+    @Column(name = "check_time")
+    private LocalDateTime checkTime;
 }

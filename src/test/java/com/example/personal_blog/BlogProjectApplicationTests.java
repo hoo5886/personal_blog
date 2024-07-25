@@ -6,7 +6,7 @@ import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuild
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.personal_blog.controller.ArticleRestController;
+import com.example.personal_blog.controller.ArticleController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class BlogProjectApplicationTests {
     private MockMvc mockMvc;
 
     @MockBean
-    private ArticleRestController controller;
+    private ArticleController controller;
 
     @Autowired
     private ObjectMapper mapper;
