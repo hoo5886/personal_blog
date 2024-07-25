@@ -2,7 +2,6 @@ package com.example.personal_blog.controller;
 
 import com.example.personal_blog.dto.ArticleDto;
 import com.example.personal_blog.service.ArticleService;
-import com.example.personal_blog.service.ContentPathService;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -80,31 +79,31 @@ public class ArticleController {
 
     /**
      * 특정 게시글 삭제
-     * @param id
+     * @param articleId
      */
-    @PutMapping("/articles/{id}/delete")
-    public ResponseEntity<String> deleteArticle(@PathVariable Long id) {
-        String response = articleService.delete(id);
+    @PutMapping("/articles/{articleId}/delete")
+    public ResponseEntity<String> deleteArticle(@PathVariable Long articleId) {
+        String response = articleService.delete(articleId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     /**
      * 게시글 좋아요
-     * @param id
+     * @param articleId
      */
-    @PutMapping("/articles/{id}/like")
-    public ResponseEntity<String> likeArticle(@PathVariable Long id) {
-        articleService.addLike(id);
+    @PutMapping("/articles/{articleId}/like")
+    public ResponseEntity<String> likeArticle(@PathVariable Long articleId) {
+        articleService.addLike(articleId);
         return new ResponseEntity<>("Likes!", HttpStatus.OK);
     }
 
     /**
      * 게시글 좋아요 취소
-     * @param id
+     * @param articleId
      */
-    @PutMapping("/articles/{id}/cancel-like")
-    public ResponseEntity<String> cancelLikeArticle(@PathVariable Long id) {
-        articleService.cancelLike(id);
+    @PutMapping("/articles/{articleId}/cancel-like")
+    public ResponseEntity<String> cancelLikeArticle(@PathVariable Long articleId) {
+        articleService.cancelLike(articleId);
         return new ResponseEntity<>("Likes canceled", HttpStatus.OK);
     }
 }

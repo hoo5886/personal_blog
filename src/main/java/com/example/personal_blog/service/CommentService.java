@@ -2,7 +2,6 @@ package com.example.personal_blog.service;
 
 import com.example.personal_blog.dto.CommentDto;
 import com.example.personal_blog.event.CommentAddedEvent;
-import com.example.personal_blog.event.Listener.CommentEventListener;
 import com.example.personal_blog.repository.ArticleRepository;
 import com.example.personal_blog.repository.CommentRepository;
 import com.example.personal_blog.repository.UserRepository;
@@ -10,11 +9,13 @@ import jakarta.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CommentService {
 
     private final CommentRepository commentRepository;
@@ -50,6 +51,7 @@ public class CommentService {
         savedComment.setArticle(article);
         commentRepository.save(savedComment);
 
+        log.info("댓글을 생성했습니다. : {}", savedComment.getComment());
         return CommentDto.from(savedComment);
     }
 

@@ -368,15 +368,17 @@ public class ControllerTest {
 
     @Test
     public void updateArticleTest() throws Exception {
+        String dtoJson = mapper.writeValueAsString(articleDto);
 
 
         final String fileName = "testImage1";
         final String fileExtension = ".png";
         final String contentPath = "src/test/resources/testImages/" + fileName + fileExtension;
+
         FileInputStream fis = new FileInputStream(contentPath);
 
         when(articleService.readArticle(any(Long.class))).thenReturn(articleDto);
-        when(articleService.update(any(ArticleDto.class), any(Long.class))).thenReturn("Updated");
+        when(articleService.update(any(Long.class), any())).thenReturn("Updated");
 
         MockMultipartFile file = new MockMultipartFile("files", fileName + fileExtension, "image/png", fis);
 

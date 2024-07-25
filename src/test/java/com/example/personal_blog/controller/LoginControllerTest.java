@@ -7,7 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.example.personal_blog.config.TestSecurityConfig;
+import com.example.personal_blog.config.test.SecurityTestConfig;
 import com.example.personal_blog.dto.request.SignInRequest;
 import com.example.personal_blog.dto.request.SignUpRequest;
 import com.example.personal_blog.dto.response.JwtAuthenticationResponse;
@@ -18,7 +18,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -31,7 +30,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(LoginController.class)
-@Import(TestSecurityConfig.class)
+@Import(SecurityTestConfig.class)
 @ActiveProfiles("test")
 public class LoginControllerTest {
     @Autowired
