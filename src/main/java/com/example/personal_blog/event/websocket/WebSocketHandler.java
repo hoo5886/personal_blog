@@ -1,9 +1,6 @@
 package com.example.personal_blog.event.websocket;
 
 import com.example.personal_blog.dto.NotificationDto;
-import com.example.personal_blog.entity.Notification;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Type;
 import java.util.concurrent.CompletableFuture;
 import lombok.Getter;

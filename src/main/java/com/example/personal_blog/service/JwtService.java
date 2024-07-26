@@ -9,6 +9,7 @@ import java.security.Key;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
+    @Setter
     @Value("${spring.token.signing.key}")
     private String jwtSigningKey;
 
@@ -38,8 +40,9 @@ public class JwtService {
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         log.info("Generating JWT for user: {}", userDetails.getUsername());
         return Jwts.builder()
-            .setClaims(extraClaims)
             .setSubject(userDetails.getUsername())
+            .claim("loginId", userDetails.getUsername())
+            .setClaims(extraClaims)
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + expiration))
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -76,7 +79,4 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public void setJwtSigningKey(String jwtSigningKey) {
-        this.jwtSigningKey = jwtSigningKey;
-    }
 }

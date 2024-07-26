@@ -2,6 +2,7 @@ package com.example.personal_blog;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.Fail.fail;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,14 +27,19 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -55,6 +61,9 @@ public class WebSocketIntegrationTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private SimpMessagingTemplate messagingTemplate;
 
     private String url;
 
@@ -127,15 +136,64 @@ public class WebSocketIntegrationTest {
         ).get(5, TimeUnit.SECONDS);
         logger.info("서버에 연결되었습니다. sessionId : {}", session.getSessionId());
 
-        //when
-        notificationService.sendNotification(
-            Notification.builder().message("test").user(user).build(), user);
+        //given
+//        notificationService.sendNotification(
+//            Notification.builder().message("test").user(user).build(), user);
 
         TimeUnit.SECONDS.sleep(1);
 
         //then
-        var notificationDto = completableFuture.get(20, TimeUnit.SECONDS);
+        var notificationDto = completableFuture.get(5, TimeUnit.SECONDS);
         assertThat(notificationDto).isNotNull();
         assertThat(notificationDto.message()).contains("게시글이 좋아요를 받았습니다.");
+    }
+
+    @Test
+    public void testSendNotification() throws Exception {
+        StompSession session = stompClient.connectAsync(url, new StompSessionHandlerAdapter() {
+                @Override
+                public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+                    logger.info("세션이 연결되었습니다. : sessionID: {}, header: {}", session.getSessionId(),
+                        connectedHeaders);
+
+                    session.subscribe("/user/testId/topic/notification",
+                        new StompFrameHandler() {
+
+                            /**
+                             * For each received message, the handler can specify the target Object type
+                             * to which the payload should be deserialized,
+                             */
+                            @Override
+                            public Type getPayloadType(StompHeaders headers) {
+                                logger.info("Received STOMP Headers: {}", headers);
+                                return NotificationDto.class;
+                            }
+
+                            @Override
+                            public void handleFrame(StompHeaders headers, Object o) {
+                                logger.info("Received notification: {}", o);
+                                if (o instanceof NotificationDto) {
+                                    completableFuture.complete((NotificationDto) o);
+                                } else {
+                                    logger.error("Unexpected payload type: {}", o.getClass());
+                                }
+                            }
+                        }
+                    );
+                }
+            }
+        ).get(5, TimeUnit.SECONDS);
+
+        // given
+        String user = "testId";
+        String message = "Hello, World!";
+        String destination = "/user/" + user + "/topic/notifications";
+
+        // when
+        messagingTemplate.convertAndSendToUser(user, destination, message);
+
+        // then
+        var notificationDto = completableFuture.get(5, TimeUnit.SECONDS);
+        assertThat(notificationDto).isNotNull();
     }
 }

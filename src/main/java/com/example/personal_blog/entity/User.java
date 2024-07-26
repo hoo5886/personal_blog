@@ -74,4 +74,9 @@ public final class User extends BaseEntity implements UserDetails {
     public boolean isCredentialsNonExpired() {
         return true;
     }
+
+    @Override
+    public String getUsername() {
+        return this.loginId; // loginId를 반환하도록 수정
+    }
 }

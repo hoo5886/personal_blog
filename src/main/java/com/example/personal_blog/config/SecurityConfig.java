@@ -2,6 +2,7 @@ package com.example.personal_blog.config;
 
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
+import com.example.personal_blog.security.CustomDaoAuthenticationProvider;
 import com.example.personal_blog.security.JwtAuthenticationFilter;
 import com.example.personal_blog.service.JpaUserDetailsService;
 import java.util.Arrays;
@@ -25,8 +26,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 @EnableWebSecurity
-@Configuration
 @RequiredArgsConstructor
+@Configuration
 public class SecurityConfig {
 
     private final JpaUserDetailsService jpaUserDetailsService;
@@ -45,6 +46,7 @@ public class SecurityConfig {
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(
                 jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -73,10 +75,10 @@ public class SecurityConfig {
      * @return 사용자 인증이 구성된 `DaoAuthenticationProvider` 인스턴스가 반환됩니다.
      */
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(jpaUserDetailsService);
+    public CustomDaoAuthenticationProvider authenticationProvider() {
+        var authProvider = new CustomDaoAuthenticationProvider();
         authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setUserDetailsService(jpaUserDetailsService);
         return authProvider;
     }
 
@@ -108,14 +110,14 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(Arrays.asList("*"));
+//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//        configuration.setAllowedHeaders(Arrays.asList("*"));
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 }
