@@ -7,13 +7,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.example.personal_blog.entity.Authority;
 import com.example.personal_blog.entity.Role;
+import com.example.personal_blog.entity.User;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @SpringBootTest
 public class JwtServiceTest {
@@ -22,33 +21,34 @@ public class JwtServiceTest {
     private String jwtSigningKey;
 
     private JwtService jwtService;
-    private UserDetails userDetails;
+    private User user;
 
     @BeforeEach
     public void setUp() {
         jwtService = new JwtService();
         jwtService.setJwtSigningKey(jwtSigningKey);
-        userDetails = User.withUsername("testuser")
-            .password("password")
-            .authorities(List.of(Authority.builder().role(Role.ROLE_USER).build()))
+
+        user = User.builder()
+            .loginId("loginId")
+            .password("12345")
             .build();
     }
 
     @Test
     public void testGenerateToken() {
-        String token = jwtService.generateToken(userDetails);
+        String token = jwtService.generateToken(user);
         assertNotNull(token);
     }
 
     @Test
     public void testExtractLoginId() {
-        String token = jwtService.generateToken(userDetails);
+        String token = jwtService.generateToken(user);
         assertEquals("testuser", jwtService.extractLoginId(token));
     }
 
     @Test
     public void testValidateToken() {
-        String token = jwtService.generateToken(userDetails);
-        assertTrue(jwtService.isTokenValid(token, userDetails));
+        String token = jwtService.generateToken(user);
+        assertTrue(jwtService.isTokenValid(token, user));
     }
 }

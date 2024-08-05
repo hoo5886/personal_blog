@@ -1,5 +1,6 @@
 package com.example.personal_blog.service;
 
+import com.example.personal_blog.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -28,21 +29,48 @@ public class JwtService {
     @Value("${spring.token.signing.expiration}")
     private long expiration;
 
+
+    /**
+     * Extracts the loginId from the token
+     * @param token
+     * @return
+     */
     public String extractLoginId(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, claims -> {
+            log.debug("All claims in token: {}", claims);
+
+            String loginId = claims.get("loginId", String.class);
+            if (loginId != null) {
+                log.debug("LoginId claim found: {}", loginId);
+                return loginId;
+            }
+
+            String subject = claims.getSubject();
+            if (subject != null) {
+                log.debug("Subject claim used as loginId: {}", subject);
+                return subject;
+            }
+
+            log.warn("No loginId or subject found in token");
+            return null;
+        });
     }
 
-    public String generateToken(UserDetails userDetails) {
-        log.info("Generating JWT for user2: {}", userDetails.getUsername());
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(User user) {
+        log.info("Generating JWT for user2: {}", user.getUsername());
+        return generateToken(new HashMap<>(), user);
     }
 
-    private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        log.info("Generating JWT for user: {}", userDetails.getUsername());
+    private String generateToken(Map<String, Object> extraClaims, User user) {
+        log.info("Generating JWT for user: {}", user.getUsername());
+
+        Map<String, Object> claims = new HashMap<>(extraClaims);
+        claims.put("sub", user.getLoginId());  // Set subject as loginId
+        claims.put("loginId", user.getLoginId());  // Ensure loginId is always set
+        claims.put("username", user.getUsername());  // Add username as a separate claim if needed
+
         return Jwts.builder()
-            .setSubject(userDetails.getUsername())
-            .claim("loginId", userDetails.getUsername())
-            .setClaims(extraClaims)
+            .setClaims(claims)
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + expiration))
             .signWith(getSigningKey(), SignatureAlgorithm.HS256)
@@ -50,10 +78,17 @@ public class JwtService {
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractLoginId(token);
-        boolean isValid = (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-        log.info("Validating JWT for user: {} - valid: {}", username, isValid);
-        return isValid;
+        try {
+            final String username = extractLoginId(token);
+            boolean isValid = (username != null && username.equals(userDetails.getUsername()))
+                && !isTokenExpired(token);
+            log.info("Validating JWT for user: {} - valid: {}", username, isValid);
+
+            return isValid;
+        } catch (Exception e) {
+            log.error("Error validating token", e);
+            return false;
+        }
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
@@ -70,8 +105,13 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token)
-            .getBody();
+        try {
+            return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token)
+                .getBody();
+        } catch (Exception e) {
+            log.error("Error parsing token: {}", token, e);
+            throw e;
+        }
     }
 
     private Key getSigningKey() {

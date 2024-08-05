@@ -63,6 +63,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             } else {
                 logger.info("유효하지 않은 토큰입니다 : {}", loginId);
             }
+        } else {
+            logger.info("유효하지 않은 토큰입니다 : {}", loginId);
         }
         filterChain.doFilter(request, response);
     }
