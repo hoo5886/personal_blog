@@ -30,16 +30,16 @@ public class NotificationService {
      * @param receiver
      */
     public void sendNotification(Notification notification, User receiver) {
-        log.info("알림을 전송합니다. : {}", notification.getMessage());
+        log.info("알림을 전송합니다. : '{}'", notification.getMessage());
         NotificationDto notificationDto = NotificationDto.from(notification);
 
         messagingTemplate.
             convertAndSendToUser(
                 receiver.getLoginId(), //사용자 로그인ID testId
-                "/topic/notification", //사용자 목적지
+                "/queue/notification", //사용자 목적지
                 notificationDto // 알림 메시지
             );
-        log.info("Notification sent to /user/{}{}", receiver.getLoginId(), "/topic/notification");
+        log.info("알림이 다음 경로로 전송됐습니다. : /user/{}{}", receiver.getLoginId(), "/queue/notification");
     }
 
     /**
