@@ -13,6 +13,7 @@ import com.example.personal_blog.dto.request.SignUpRequest;
 import com.example.personal_blog.dto.response.JwtAuthenticationResponse;
 import com.example.personal_blog.service.AuthenticationService;
 import com.example.personal_blog.service.JpaUserDetailsService;
+import com.example.personal_blog.service.JwtBlacklistService;
 import com.example.personal_blog.service.JwtService;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +42,9 @@ public class LoginControllerTest {
 
     @MockBean
     private JpaUserDetailsService jpaUserDetailsService;
+
+    @MockBean
+    private JwtBlacklistService jwtBlacklistService;
 
     @MockBean
     private JwtService jwtService;

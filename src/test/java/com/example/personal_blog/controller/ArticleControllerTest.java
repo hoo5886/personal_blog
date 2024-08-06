@@ -12,7 +12,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.subsectionWithPath;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -48,6 +47,7 @@ import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.multipart.MultipartFile;
 
 /*
 * If you want to focus only on the web layer and not start a complete ApplicationContext,
@@ -55,7 +55,7 @@ import org.springframework.web.context.WebApplicationContext;
 * */
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(controllers = ArticleController.class)
-public class ControllerTest {
+public class ArticleControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -157,20 +157,22 @@ public class ControllerTest {
     }
 
     @Test
-    @DisplayName("게시글 작성")
+    @DisplayName("게시글 저장")
     void write() throws Exception {
         String dtoJson = mapper.writeValueAsString(articleDto);
 
         MockMultipartFile jsonFile = new MockMultipartFile("article", "", "application/json", dtoJson.getBytes());
         MockMultipartFile imageFile = new MockMultipartFile("files", "image.jpg", "image/jpeg", "image content".getBytes());
 
-
-        this.mockMvc.perform(multipart("/write")
+        when(articleService.write(any(ArticleDto.class), any(MultipartFile[].class))).thenReturn(articleDto);
+        this.mockMvc.perform(
+            multipart("/write")
                 .file(jsonFile)
                 .file(imageFile)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
-                .content(dtoJson))
+                .content(dtoJson)
+            )
             .andDo(print())
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.articleId").value(1L))
@@ -378,7 +380,7 @@ public class ControllerTest {
         FileInputStream fis = new FileInputStream(contentPath);
 
         when(articleService.readArticle(any(Long.class))).thenReturn(articleDto);
-        when(articleService.update(any(Long.class), any())).thenReturn("Updated");
+        when(articleService.update(any(Long.class), any(), any())).thenReturn("Updated");
 
         MockMultipartFile file = new MockMultipartFile("files", fileName + fileExtension, "image/png", fis);
 

@@ -79,10 +79,10 @@ public class JwtService {
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         try {
-            final String username = extractLoginId(token);
-            boolean isValid = (username != null && username.equals(userDetails.getUsername()))
+            final String loginId = extractLoginId(token);
+            boolean isValid = (loginId != null && loginId.equals(userDetails.getUsername()))
                 && !isTokenExpired(token);
-            log.info("Validating JWT for user: {} - valid: {}", username, isValid);
+            log.info("Validating JWT for user: {} - valid: {}", loginId, isValid);
 
             return isValid;
         } catch (Exception e) {

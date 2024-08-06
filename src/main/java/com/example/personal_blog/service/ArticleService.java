@@ -11,6 +11,7 @@ import com.example.personal_blog.repository.ContentPathRepository;
 import com.example.personal_blog.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -89,7 +90,7 @@ public class ArticleService {
      * @param articleId
      * @return
      */
-    public String update(Long articleId, MultipartFile[] files) throws IOException {
+    public String update(Long articleId, ArticleDto dto, MultipartFile[] files) throws IOException {
         var article = articleRepository.findById(articleId)
             .orElseThrow(() -> new RuntimeException("게시글이 존재하지 않습니다. articleId: " + articleId));
 
@@ -97,8 +98,9 @@ public class ArticleService {
             contentPathService.updateImages(files, article);
         }
 
-        article.setTitle(article.getTitle());
-        article.setContent(article.getContent());
+        article.setTitle(dto.title());
+        article.setContent(dto.content());
+        article.setUpdatedAt(LocalDateTime.now());
         articleRepository.save(article);
 
         return "수정된 글: " + article.getArticleId();

@@ -72,7 +72,7 @@ public class ArticleController {
     public ResponseEntity<String> updateArticle(@RequestPart("article") ArticleDto articleDto,
                                                 @PathVariable Long articleId,
                                                 @RequestPart(value = "files", required = false) MultipartFile[] files) throws IOException{
-        String response = articleService.update(articleId, files);
+        String response = articleService.update(articleId, articleDto, files);
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

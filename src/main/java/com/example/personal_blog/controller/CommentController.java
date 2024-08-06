@@ -15,26 +15,47 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/articles/{articleId}/comments")
+@RequestMapping("/articles")
 public class CommentController {
 
     private final CommentService commentService;
 
-    @PostMapping
-    public ResponseEntity<CommentDto> createComment(@PathVariable Long articleId, @RequestBody CommentDto commentDto) {
+    /**
+     * 댓글 생성
+     * @param articleId
+     * @param commentDto
+     * @return
+     */
+    @PostMapping("/{articleId}/comments")
+    public ResponseEntity<CommentDto> createComment(@PathVariable Long articleId,
+        @RequestBody CommentDto commentDto) {
 
         CommentDto createdComment = commentService.createComment(articleId, commentDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdComment);
     }
 
-    @PutMapping("/{commentId}")
-    public ResponseEntity<CommentDto> updateComment(@PathVariable Long articleId, @PathVariable Long commentId, @RequestBody CommentDto commentDto) {
+    /**
+     * 댓글 수정
+     * @param articleId
+     * @param commentId
+     * @param commentDto
+     * @return
+     */
+    @PutMapping("/{articleId}/comments/{commentId}")
+    public ResponseEntity<CommentDto> updateComment(@PathVariable Long articleId,
+        @PathVariable Long commentId, @RequestBody CommentDto commentDto) {
 
         CommentDto updatedComment = commentService.updateComment(articleId, commentDto, commentId);
         return ResponseEntity.ok(updatedComment);
     }
 
-    @DeleteMapping("/{commentId}")
+    /**
+     * 댓글 삭제
+     * @param articleId
+     * @param commentId
+     * @return
+     */
+    @DeleteMapping("/{articleId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(@PathVariable Long articleId, @PathVariable Long commentId) {
 
         commentService.deleteComment(commentId);
