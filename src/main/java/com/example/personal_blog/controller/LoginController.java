@@ -46,6 +46,6 @@ public class LoginController {
             long expiration = jwtService.extractExpiration(jwt).getTime() - System.currentTimeMillis();
             jwtBlacklistService.blacklistToken(jwt, expiration);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

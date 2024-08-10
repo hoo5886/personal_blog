@@ -1,0 +1,17 @@
+1. 로그인
+
+**Request**
+include::{snippets}/auth-login/http-request.adoc[]
+**Response**
+include::{snippets}/auth-login/http-response.adoc[]
+
+2. 회원가입
+
+**Request**
+include::{snippets}/auth-signup/http-request.adoc[]
+
+**Response**
+include::{snippets}/auth-signup/http-response.adoc[]
+
+
+3. 회원정보 수정

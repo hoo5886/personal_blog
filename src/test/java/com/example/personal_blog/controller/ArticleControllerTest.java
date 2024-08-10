@@ -38,6 +38,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -53,6 +54,7 @@ import org.springframework.web.multipart.MultipartFile;
 * If you want to focus only on the web layer and not start a complete ApplicationContext,
 * consider using @WebMvcTest instead.
 * */
+@AutoConfigureRestDocs
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(controllers = ArticleController.class)
 public class ArticleControllerTest {

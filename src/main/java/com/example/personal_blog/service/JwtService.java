@@ -96,7 +96,7 @@ public class JwtService {
         return claimsResolvers.apply(claims);
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 

@@ -1,0 +1,7 @@
+= Getting Started with Quarkus
+include::{snippets}/article/http-request.adoc[]
+
+include::{snippets}/article/http-response.adoc[]
+
+include::{snippets}/articles/http-request.adoc[]
+include::{snippets}/articles/http-response.adoc[]
