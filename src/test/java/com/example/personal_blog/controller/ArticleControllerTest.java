@@ -148,17 +148,6 @@ public class ArticleControllerTest {
     }
 
     @Test
-    void hello() throws Exception{
-        this.mockMvc.perform(get("/hello").accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().string("Hello World!"))
-            .andDo(print())
-            .andReturn()
-            .getResponse()
-            .getContentAsString().equals("Hello World!");
-    }
-
-    @Test
     @DisplayName("게시글 저장")
     void write() throws Exception {
         String dtoJson = mapper.writeValueAsString(articleDto);
@@ -353,7 +342,7 @@ public class ArticleControllerTest {
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().string("Likes!"))
-            .andDo(document("/articles/{id}/like"));
+            .andDo(document("/articles/{articleId}/like"));
     }
 
     @Test
@@ -367,10 +356,11 @@ public class ArticleControllerTest {
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(content().string("Likes canceled"))
-            .andDo(document("/articles/{id}/cancel-like"));
+            .andDo(document("/articles/{articleId}/cancel-like"));
     }
 
     @Test
+    @DisplayName("게시글 수정")
     public void updateArticleTest() throws Exception {
         String dtoJson = mapper.writeValueAsString(articleDto);
 
@@ -393,6 +383,21 @@ public class ArticleControllerTest {
                 .file(file)
                 .file(jsonFile)
                 .contentType("multipart/form-data"))
-            .andExpect(status().isOk());
+            .andExpect(status().isOk())
+            .andDo(document("/articles/{articleId}/update"));
+    }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    public void deleteArticleTest() throws Exception {
+        given(articleService.delete(1L)).willReturn("Deleted");
+
+        this.mockMvc.perform(put("/articles/1/delete")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(content().string("Deleted"))
+            .andDo(document("/articles/{articleId}/delete"));
     }
 }
