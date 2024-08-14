@@ -15,6 +15,7 @@
 
 .Request
 include::{snippets}/auth/auth-login/http-request.adoc[]
+
 .Response
 include::{snippets}/auth/auth-login/http-response.adoc[]
 
