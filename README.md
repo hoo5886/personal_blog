@@ -65,3 +65,94 @@
 
 ## 4. API 명세
 [문서참조](src/docs/asciidoc/index.adoc)
+
+## 5. 프로젝트 구조
+```
+src
+├── main
+│   ├── java
+│   │   └── com
+│   │       └── blog
+│   │           ├── BlogApplication.java
+│   │           ├── config
+│   │           │   ├── JacksonConfig.java
+│   │           │   ├── SecurityConfig.java
+│   │           │   └── WebSocketConfig.java
+│   │           ├── controller
+│   │           │   ├── ArticleController.java
+│   │           │   ├── CommentController.java
+│   │           │   ├── LoginController.java
+│   │           │   └── NotificationController.java
+│   │           ├── dto
+│   │           │   ├── request
+│   │           │   │   ├── SignInRequest.java
+│   │           │   │   └── SignUpRequest.java
+│   │           │   ├── response
+│   │           │   │   └── JwtAuthenticationResponse.java
+│   │           │   ├── ArticleDto.java
+│   │           │   ├── CommentDto.java
+│   │           │   ├── NotificationDto.java
+│   │           │   └── UserDto.java
+│   │           ├── entity
+│   │           │   ├── Article.java
+│   │           │   ├── Authority.java
+│   │           │   ├── BaseEntity.java
+│   │           │   ├── Comment.java
+│   │           │   ├── ContentPath.java
+│   │           │   ├── Notification.java
+│   │           │   ├── Role.java
+│   │           │   └── User.java
+│   │           ├── event
+│   │           │   ├── Listener
+│   │           │   │   ├── ArticleEventListener.java
+│   │           │   │   └── CommentEventListener.java
+│   │           │   ├── websocket
+│   │           │   │   └── WebSocketHandler.java
+│   │           │   ├── ArticleDto.java
+│   │           │   ├── CommentDto.java
+│   │           │   ├── NotificationDto.java
+│   │           │   └── UserDto.java
+│   │           ├── exception
+│   │           │   └── GlobalExceptionHandler.java
+│   │           ├── repository
+│   │           │   ├── ArticleRepository.java
+│   │           │   ├── AuthorityRepository.java
+│   │           │   ├── CommentRepository.java
+│   │           │   ├── ContentPathRepository.java
+│   │           │   ├── NotificationRepository.java
+│   │           │   └── UserRepository.java
+│   │           ├── security
+│   │           │   ├── CustomDaoAuthenticationProvider.java
+│   │           │   └── JwtAuthenticationFilter.java
+│   │           └── service
+│   │               ├── ArticleService.java
+│   │               ├── AuthenticationService.java
+│   │               ├── CommentService.java
+│   │               ├── ContentPathService.java
+│   │               ├── JpaUserDetailsService.java
+│   │               ├── JwtBlacklistService.java
+│   │               ├── NotificationService.java
+│   │               └── JwtService.java
+│   └── resources
+│       ├── application.yml
+│       ├── personal_blog_db_model.svg
+│       ├── static
+│       │   └── images
+│       └── templates
+└── test
+    └── java
+        └── com
+            └── blog
+                ├── controller
+                │   ├── ArticleControllerTest.java
+                │   ├── AuthControllerTest.java
+                │   ├── CommentControllerTest.java
+                │   ├── NotificationControllerTest.java
+                │   └── UserControllerTest.java
+                ├── service
+                │   ├── ArticleServiceTest.java
+                │   ├── CommentServiceTest.java
+                │   ├── NotificationServiceTest.java
+                │   └── UserServiceTest.java
+                └── BlogApplicationTests.java
+```
