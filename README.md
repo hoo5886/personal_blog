@@ -66,7 +66,10 @@
 ## 4. API 명세
 [문서참조](src/docs/asciidoc/index.adoc)
 
-## 5. 프로젝트 구조
+## 5. 트러블슈팅 및 해결방법
+[문서참조](src/docs/asciidoc/troubleShooting.adoc)
+
+## 6. 프로젝트 구조
 ```
 src
 ├── main
