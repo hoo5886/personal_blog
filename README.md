@@ -111,10 +111,8 @@ src
 │   │           │   │   └── CommentEventListener.java
 │   │           │   ├── websocket
 │   │           │   │   └── WebSocketHandler.java
-│   │           │   ├── ArticleDto.java
-│   │           │   ├── CommentDto.java
-│   │           │   ├── NotificationDto.java
-│   │           │   └── UserDto.java
+│   │           │   ├── ArticleLikedEvent.java
+│   │           │   └── CommentAddedEvent.java
 │   │           ├── exception
 │   │           │   └── GlobalExceptionHandler.java
 │   │           ├── repository
@@ -148,14 +146,18 @@ src
             └── blog
                 ├── controller
                 │   ├── ArticleControllerTest.java
-                │   ├── AuthControllerTest.java
                 │   ├── CommentControllerTest.java
-                │   ├── NotificationControllerTest.java
-                │   └── UserControllerTest.java
+                │   └── LoginControllerTest.java
                 ├── service
                 │   ├── ArticleServiceTest.java
-                │   ├── CommentServiceTest.java
-                │   ├── NotificationServiceTest.java
-                │   └── UserServiceTest.java
+                │   ├── ContentPathServiceTest.java
+                │   ├── JwtServiceTest.java
+                │   └── NotificationServiceTest.java
+                ├── testconfig
+                │   ├── filter
+                │   │   └── MockJwtAuthenticationFIlter.java
+                │   └── TestSecurityConfig.java
+                ├── websocket
+                │   └── WebSocketIntegrationTest.java
                 └── BlogApplicationTests.java
 ```
